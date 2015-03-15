@@ -2,10 +2,17 @@ Project ideas:
 
 Idea 1:  Game using Google Map 
 
-	- User solves a mystery using things collected on Google Maps (we place on the markers on the map in predefined locations and the user navigates the map on the device - does not integrate walking places.  We'd just pick a location for the mystery to occur and that's where it would be for all users)
-	- Things can include simple clues and maybe a few mini-games
+	- User solves a mystery using things collected on Google Maps 
+		-we place on the markers on the map (probably design a few different markers for different types of items/clues/events) in predefined locations and the user navigates the map on the device - does not integrate physically walking places.  The map is essentially the gameboard.  We'd just pick a location for the mystery to occur and that's where it would be for all users
+	- Things that happen when a user touches a marker can include simple clues, object collection, and maybe a few mini-games
 		- Maybe one of these could need the camera or external device to fullfil #4 and 5
 		- Another could use a web service
+		- clues/objects could be stored using internal storage to fullfil another requirement.
 	- This also allows for expansion if other GV students wanted to add more cases.
 
-Idea 2:  
+Idea 2:  GVSU Classroom/Office Map
+
+	- Allows user to look up any classroom or faculty office on the Allendale campus and find it on Google Maps
+	- I like this idea less because it would be a lot more non-coding work on our part - we'd have to figure out the coordinates of every classroom and office on campus, figure out which faculty occupy each office, and make our own database with that information.
+
+If you guys have other ideas, I'm open to them.
