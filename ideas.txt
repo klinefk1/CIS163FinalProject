@@ -16,3 +16,5 @@ Idea 2:  GVSU Classroom/Office Map
 	- I like this idea less because it would be a lot more non-coding work on our part - we'd have to figure out the coordinates of every classroom and office on campus, figure out which faculty occupy each office, and make our own database with that information.
 
 If you guys have other ideas, I'm open to them.
+
+asdfasd
