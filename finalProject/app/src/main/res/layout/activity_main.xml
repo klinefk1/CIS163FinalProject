@@ -9,8 +9,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start New Game"
-        android:id="@+id/startCase1"
+        android:text="Bounty Hunter"
+        android:id="@+id/bountyHunter"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Name of App"
+        android:text="Assassin"
         android:id="@+id/title"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
@@ -28,12 +28,12 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Continue"
-        android:id="@+id/button2"
-        android:layout_alignRight="@+id/startCase1"
-        android:layout_alignEnd="@+id/startCase1"
-        android:layout_above="@+id/startCase1"
-        android:layout_alignLeft="@+id/startCase1"
-        android:layout_alignStart="@+id/startCase1" />
+        android:text="Free-For-All"
+        android:id="@+id/freeForAll"
+        android:layout_alignRight="@+id/bountyHunter"
+        android:layout_alignEnd="@+id/bountyHunter"
+        android:layout_above="@+id/bountyHunter"
+        android:layout_alignLeft="@+id/bountyHunter"
+        android:layout_alignStart="@+id/bountyHunter" />
 
 </RelativeLayout>
