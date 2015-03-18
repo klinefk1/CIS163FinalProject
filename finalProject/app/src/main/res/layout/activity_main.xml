@@ -12,7 +12,8 @@
         android:text="Bounty Hunter"
         android:id="@+id/bountyHunter"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_toRightOf="@+id/freeForAll"
+        android:layout_toEndOf="@+id/freeForAll" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,10 +31,18 @@
         android:layout_height="wrap_content"
         android:text="Free-For-All"
         android:id="@+id/freeForAll"
-        android:layout_alignRight="@+id/bountyHunter"
-        android:layout_alignEnd="@+id/bountyHunter"
-        android:layout_above="@+id/bountyHunter"
-        android:layout_alignLeft="@+id/bountyHunter"
-        android:layout_alignStart="@+id/bountyHunter" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Win/Loss Records"
+        android:id="@+id/records"
+        android:layout_below="@+id/title"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
