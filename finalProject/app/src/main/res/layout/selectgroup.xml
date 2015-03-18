@@ -23,15 +23,19 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Current Group"
         android:id="@+id/currentgroup"
-        android:layout_above="@+id/infolist"
+        android:layout_below="@+id/editText"
         android:layout_centerHorizontal="true" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/infolist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/currentgroup"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/title"/>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <EditText
         android:layout_width="wrap_content"
