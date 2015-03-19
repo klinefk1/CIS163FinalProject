@@ -8,6 +8,8 @@ import android.location.LocationListener;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -17,6 +19,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -28,12 +31,11 @@ public class MapsActivity extends FragmentActivity implements
         com.google.android.gms.location.LocationListener{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
     private static final String TAG = "GooglePlayServicesActivity";
-
     private static final String KEY_IN_RESOLUTION = "is_in_resolution";
-
     private Marker myMarker;
+    private boolean confirmedKill = false;
+    private Button kill;
 
     /**
      * Request code for auto Google Play Services error resolution.
@@ -61,8 +63,18 @@ public class MapsActivity extends FragmentActivity implements
         if (savedInstanceState != null) {
             mIsInResolution = savedInstanceState.getBoolean(KEY_IN_RESOLUTION, false);
         }
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.mapdisplay);
         setUpMapIfNeeded();
+
+        kill = (Button) findViewById(R.id.killbutton);
+
+        kill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent killScreen = new Intent(MapsActivity.this, KillActivity.class);
+            }
+        });
+
     }
 
 
@@ -243,4 +255,18 @@ public class MapsActivity extends FragmentActivity implements
         else
             myMarker.setPosition(geoPos);
     }
+
+    //sets a marker at the location of a kill.  Should later record information about it
+    //once the add players and store info about players datapase is set up
+    private void setKillMarker(){
+        if(confirmedKill){
+            LatLng geoPos = new LatLng(myMarker.getPosition().latitude, myMarker.getPosition().longitude);
+            mMap.addMarker(new MarkerOptions()
+                    .position(geoPos)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher)));
+            //above is a sample icon...replace with something better later.
+            confirmedKill = false;
+        }
+    }
+
 }
