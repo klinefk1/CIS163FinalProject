@@ -22,7 +22,7 @@ public class KillActivity extends ActionBarActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.killscreen);
 
-        kill = (Button) findViewById(R.id.mapTest);
+        kill = (Button) findViewById(R.id.killButton);
 
         kill.setOnClickListener(new View.OnClickListener() {
             @Override

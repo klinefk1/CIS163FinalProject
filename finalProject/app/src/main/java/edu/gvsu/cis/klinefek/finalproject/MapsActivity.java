@@ -135,6 +135,7 @@ public class MapsActivity extends FragmentActivity implements
             //works on the result of the kill activity
             if (data.hasExtra("kill")) {
                 confirmedKill = data.getBooleanExtra("kill", false);
+                setKillMarker();
             }
         }
         else {
