@@ -66,17 +66,22 @@ public class MapsActivity extends FragmentActivity implements
         setContentView(R.layout.mapdisplay);
         setUpMapIfNeeded();
 
+        Intent fromKill = getIntent();
+        if(fromKill.getBooleanExtra("kill", true)){
+
+        }
+
         kill = (Button) findViewById(R.id.killbutton);
 
         kill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent killScreen = new Intent(MapsActivity.this, KillActivity.class);
+                startActivityForResult(killScreen, 0xFACE);
             }
         });
 
     }
-
 
     /**
      * Called when the Activity is made visible.
@@ -126,12 +131,21 @@ public class MapsActivity extends FragmentActivity implements
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_CODE_RESOLUTION:
-                retryConnecting();
-                break;
+        if (resultCode ==  RESULT_OK && requestCode == 0xFACE) {
+            //works on the result of the kill activity
+            if (data.hasExtra("kill")) {
+                confirmedKill = data.getBooleanExtra("kill", false);
+            }
         }
+        else {
+            super.onActivityResult(requestCode, resultCode, data);
+            switch (requestCode) {
+                case REQUEST_CODE_RESOLUTION:
+                    retryConnecting();
+                    break;
+            }
+        }
+
     }
     private void retryConnecting() {
         mIsInResolution = false;
