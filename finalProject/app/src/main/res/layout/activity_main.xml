@@ -45,4 +45,12 @@
         android:layout_below="@+id/title"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Instructions"
+        android:id="@+id/instructions"
+        android:layout_above="@+id/bountyHunter"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
