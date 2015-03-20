@@ -25,8 +25,10 @@ public class KillActivity extends ActionBarActivity {
         kill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //need to select person killed either based on location or select from a list
+
                 //need to wait a designated amount of time for other player to confirm (5 min?), then
-                //if they do,
+                //if they do, launch the intent
                 Intent launchMap = new Intent();
                 launchMap.putExtra("kill", true);
                 setResult(RESULT_OK, launchMap);

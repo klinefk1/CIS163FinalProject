@@ -163,7 +163,7 @@ public class MapsActivity extends FragmentActivity implements
         Log.i(TAG, "GoogleApiClient connected");
         // TODO: Start making API requests.
         LocationRequest req = new LocationRequest();
-        req.setInterval(3000); /*every 3 seconds*/
+        req.setInterval(10000); /*every 10 seconds*/
         req.setFastestInterval(1000); /*how fast our app can handle the notifications */
         req.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
@@ -262,11 +262,16 @@ public class MapsActivity extends FragmentActivity implements
         LatLng geoPos = new LatLng(location.getLatitude(), location.getLongitude());
         CameraPosition campos = CameraPosition.builder()
                 .target(geoPos)
-                .zoom(18)
+                .zoom(14)
                 .build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(campos));
-        if (myMarker == null) /*if we don't have a marker yet, create and add */
+        if (myMarker == null) /*if we don't have a marker yet, create and add */ {
             myMarker = mMap.addMarker(new MarkerOptions().position(geoPos));
+
+            //hides the marker itself...may or may not keep this
+            //depending on if it can be hidden from all players except this player
+            myMarker.setVisible(false);
+        }
         else
             myMarker.setPosition(geoPos);
     }
@@ -278,7 +283,7 @@ public class MapsActivity extends FragmentActivity implements
             LatLng geoPos = new LatLng(myMarker.getPosition().latitude, myMarker.getPosition().longitude);
             mMap.addMarker(new MarkerOptions()
                     .position(geoPos)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher)));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
             //above is a sample icon...replace with something better later.
             confirmedKill = false;
         }
