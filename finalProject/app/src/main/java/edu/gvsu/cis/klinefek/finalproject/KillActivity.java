@@ -1,21 +1,19 @@
 package edu.gvsu.cis.klinefek.finalproject;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-/**
- * Created by katherineklinefelter on 3/19/15.
- */
-public class KillActivity extends ActionBarActivity{
-    //if the player being killed confirms the kill in a reasonable amount of time (5 min?)
-    //it changes confirmed kill in MapsActivity to true by passing extra
 
-    private Button kill;
+public class KillActivity extends ActionBarActivity {
+
+
+    //allows me to test the map...delete later
+    Button kill;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,12 +25,12 @@ public class KillActivity extends ActionBarActivity{
         kill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //this should happen only if the other player confirms
-
-                Intent launchMap = new Intent(KillActivity.this, MapsActivity.class);
+                //need to wait a designated amount of time for other player to confirm (5 min?), then
+                //if they do,
+                Intent launchMap = new Intent();
                 launchMap.putExtra("kill", true);
-                startActivity(launchMap);
+                setResult(RESULT_OK, launchMap);
+                finish();
             }
         });
 

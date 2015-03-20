@@ -47,6 +47,10 @@
             android:name=".GooglePlayServicesActivity"
             android:label="@string/title_activity_google_play_services" >
         </activity>
+        <activity
+            android:name=".KillActivity"
+            android:label="Kill" >
+        </activity>
     </application>
 
 </manifest>

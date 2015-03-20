@@ -76,8 +76,8 @@ public class MapsActivity extends FragmentActivity implements
         kill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent killScreen = new Intent(MapsActivity.this, KillActivity.class);
-                startActivityForResult(killScreen, 0xFACE);
+                Intent act = new Intent(MapsActivity.this, KillActivity.class);
+                startActivityForResult(act, 42);
             }
         });
 
@@ -131,7 +131,7 @@ public class MapsActivity extends FragmentActivity implements
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode ==  RESULT_OK && requestCode == 0xFACE) {
+        if (resultCode ==  RESULT_OK && requestCode == 42) {
             //works on the result of the kill activity
             if (data.hasExtra("kill")) {
                 confirmedKill = data.getBooleanExtra("kill", false);
