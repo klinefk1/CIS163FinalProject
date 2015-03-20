@@ -9,27 +9,33 @@ import android.view.View;
 import android.widget.Button;
 
 
-public class MainActivity extends ActionBarActivity {
+public class KillActivity extends ActionBarActivity {
 
-    private Button bountyHunter, freeForAll, records, toMap;
+
+    //allows me to test the map...delete later
+    Button kill;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.killscreen);
 
-        bountyHunter = (Button) findViewById(R.id.bountyHunter);
-        freeForAll = (Button) findViewById(R.id.freeForAll);
-        records = (Button) findViewById(R.id.records);
-        toMap = (Button) findViewById(R.id.mapTest);
+        kill = (Button) findViewById(R.id.killButton);
 
-        toMap.setOnClickListener(new View.OnClickListener() {
+        kill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent launchMap = new Intent(MainActivity.this, MapsActivity.class);
-                startActivity(launchMap);
+                //need to select person killed either based on location or select from a list
+
+                //need to wait a designated amount of time for other player to confirm (5 min?), then
+                //if they do, launch the intent
+                Intent launchMap = new Intent();
+                launchMap.putExtra("kill", true);
+                setResult(RESULT_OK, launchMap);
+                finish();
             }
         });
+
     }
 
 
