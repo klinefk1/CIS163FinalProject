@@ -60,7 +60,6 @@
         android:text="Test Map - delete later"
         android:id="@+id/mapTest"
         android:layout_below="@+id/records"
-        android:layout_alignRight="@+id/title"
-        android:layout_alignEnd="@+id/title" />
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
