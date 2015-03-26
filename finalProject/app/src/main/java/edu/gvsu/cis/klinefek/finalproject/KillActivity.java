@@ -18,7 +18,7 @@ public class KillActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.killscreen);s
+        setContentView(R.layout.killscreen);
 
         kill = (Button) findViewById(R.id.killButton);
 

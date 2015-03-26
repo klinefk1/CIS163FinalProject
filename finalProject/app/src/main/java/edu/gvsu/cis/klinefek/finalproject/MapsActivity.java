@@ -31,7 +31,7 @@ import java.util.ArrayList;
 public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        com.google.android.gms.location.LocationListener,{
+        com.google.android.gms.location.LocationListener{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private static final String TAG = "GooglePlayServicesActivity";
@@ -68,6 +68,10 @@ public class MapsActivity extends FragmentActivity implements
             mIsInResolution = savedInstanceState.getBoolean(KEY_IN_RESOLUTION, false);
         }
 
+
+        setContentView(R.layout.mapdisplay);
+        setUpMapIfNeeded();
+
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
@@ -82,8 +86,6 @@ public class MapsActivity extends FragmentActivity implements
                 }
             }
         }
-        setContentView(R.layout.mapdisplay);
-        setUpMapIfNeeded();
 
         Intent fromKill = getIntent();
         if(fromKill.getBooleanExtra("kill", true)){
@@ -146,6 +148,9 @@ public class MapsActivity extends FragmentActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_IN_RESOLUTION, mIsInResolution);
+
+        // Adding the killLocations arraylist to Bundle
+        outState.putParcelableArrayList("points", killLocations);
     }
 
 
@@ -317,12 +322,4 @@ public class MapsActivity extends FragmentActivity implements
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        // Adding the killLocations arraylist to Bundle
-        outState.putParcelableArrayList("points", killLocations);
-
-        // Saving the bundle
-        super.onSaveInstanceState(outState);
-    }
 }

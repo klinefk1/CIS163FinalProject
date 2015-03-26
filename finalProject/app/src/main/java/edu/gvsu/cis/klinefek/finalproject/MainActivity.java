@@ -18,10 +18,10 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bountyHunter = (Button) findViewById(R.id.bountyHunter);
-        freeForAll = (Button) findViewById(R.id.freeForAll);
-        records = (Button) findViewById(R.id.records);
-        toMap = (Button) findViewById(R.id.mapTest);
+//        bountyHunter = (Button) findViewById(R.id.bountyHunter);
+//        freeForAll = (Button) findViewById(R.id.freeForAll);
+//        records = (Button) findViewById(R.id.records);
+        toMap = (Button) findViewById(R.id.Start);
 
         toMap.setOnClickListener(new View.OnClickListener() {
             @Override
