@@ -13,12 +13,12 @@ public class KillActivity extends ActionBarActivity {
 
 
     //allows me to test the map...delete later
-    Button kill;
+    private Button kill;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.killscreen);
+        setContentView(R.layout.killscreen);s
 
         kill = (Button) findViewById(R.id.killButton);
 
