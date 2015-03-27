@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.location.LocationListener;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -36,6 +39,7 @@ public class MapsActivity extends FragmentActivity implements
     private Marker myMarker;
     private boolean confirmedKill = false;
     private Button kill;
+    private ArrayList<LatLng> killLocations;
 
     /**
      * Request code for auto Google Play Services error resolution.
@@ -63,8 +67,25 @@ public class MapsActivity extends FragmentActivity implements
         if (savedInstanceState != null) {
             mIsInResolution = savedInstanceState.getBoolean(KEY_IN_RESOLUTION, false);
         }
+
+
         setContentView(R.layout.mapdisplay);
         setUpMapIfNeeded();
+
+        // Restoring the markers on configuration changes
+        if(savedInstanceState!=null){
+            if(savedInstanceState.containsKey("points")){
+                killLocations = savedInstanceState.getParcelableArrayList("points");
+                if(killLocations!=null){
+                    for(int i=0;i<killLocations.size();i++){
+                        mMap.addMarker(new MarkerOptions()
+                                .position(killLocations.get(i))
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
+
+                    }
+                }
+            }
+        }
 
         Intent fromKill = getIntent();
         if(fromKill.getBooleanExtra("kill", true)){
@@ -72,6 +93,10 @@ public class MapsActivity extends FragmentActivity implements
         }
 
         kill = (Button) findViewById(R.id.killbutton);
+
+        //assumes that there are eight or less players
+        killLocations = new ArrayList<LatLng>();
+
 
         kill.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,6 +148,9 @@ public class MapsActivity extends FragmentActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_IN_RESOLUTION, mIsInResolution);
+
+        // Adding the killLocations arraylist to Bundle
+        outState.putParcelableArrayList("points", killLocations);
     }
 
 
@@ -281,10 +309,15 @@ public class MapsActivity extends FragmentActivity implements
     private void setKillMarker(){
         if(confirmedKill){
             LatLng geoPos = new LatLng(myMarker.getPosition().latitude, myMarker.getPosition().longitude);
+            killLocations.add(geoPos);
+            //this is used to store each kill location so that they can be
+            //reset when orientation changes and updated for other players
+
+            //adds marker to the map
             mMap.addMarker(new MarkerOptions()
                     .position(geoPos)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
-            //above is a sample icon...replace with something better later.
+
             confirmedKill = false;
         }
     }

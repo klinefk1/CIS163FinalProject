@@ -13,7 +13,7 @@ public class KillActivity extends ActionBarActivity {
 
 
     //allows me to test the map...delete later
-    Button kill;
+    private Button kill;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
