@@ -44,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements
     private Button kill;
     private ArrayList<LatLng> killLocations;
     private ArrayList<String> killInfo;
+    private ArrayList<String> killTitle;
 
     /**
      * Request code for auto Google Play Services error resolution.
@@ -78,17 +79,19 @@ public class MapsActivity extends FragmentActivity implements
 
         killLocations = new ArrayList<LatLng>();
         killInfo = new ArrayList<String>();
+        killTitle = new ArrayList<String>();
 
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
                 killLocations = savedInstanceState.getParcelableArrayList("points");
                 killInfo = savedInstanceState.getStringArrayList("info");
+                killTitle = savedInstanceState.getStringArrayList("title");
                 if(killLocations!=null){
                     for(int i=0;i<killLocations.size();i++){
                         mMap.addMarker(new MarkerOptions()
                                 .position(killLocations.get(i))
-                                .title("Person Killed")
+                                .title(killTitle.get(i))
                                 .snippet(killInfo.get(i))
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
                     }
@@ -159,6 +162,7 @@ public class MapsActivity extends FragmentActivity implements
         //Markers can be reset
         outState.putParcelableArrayList("points", killLocations);
         outState.putStringArrayList("info", killInfo);
+        outState.putStringArrayList("title", killTitle);
     }
 
 
@@ -322,16 +326,18 @@ public class MapsActivity extends FragmentActivity implements
             //reset when orientation changes and updated for other players
 
             //finds info to use when setting marker message box
-            String killedName = "Sample Name";
+            String killedName;
             String otherinfo;
 
             otherinfo = setMarkerInfo();
+            killedName = setMarkerInfo2();
+
 
 
             //adds marker to the map
             mMap.addMarker(new MarkerOptions()
                     .position(geoPos)
-                    .title("Player Killed: " + killedName)
+                    .title(killedName)
                     .snippet(otherinfo)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
             confirmedKill = false;
@@ -340,13 +346,22 @@ public class MapsActivity extends FragmentActivity implements
 
     private String setMarkerInfo(){
         String info = "";
-        //fill this in when player storage complete
-        info += "Killed by: " + "Me...bwahaha\n";
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         Date date = new Date();
         info += "Time Killed: " + dateFormat.format(date).toString();
 
         killInfo.add(info);
+        //stores the kill info at the same index of its arrayList as the location
+
+        return info;
+    }
+
+    private String setMarkerInfo2(){
+        String info = "";
+        //fill this in when player storage complete
+        info += "Player" +" was killed by " + "me";
+
+        killTitle.add(info);
         //stores the kill info at the same index of its arrayList as the location
 
         return info;
