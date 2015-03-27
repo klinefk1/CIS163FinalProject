@@ -26,7 +26,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -40,6 +43,7 @@ public class MapsActivity extends FragmentActivity implements
     private boolean confirmedKill = false;
     private Button kill;
     private ArrayList<LatLng> killLocations;
+    private ArrayList<String> killInfo;
 
     /**
      * Request code for auto Google Play Services error resolution.
@@ -72,16 +76,21 @@ public class MapsActivity extends FragmentActivity implements
         setContentView(R.layout.mapdisplay);
         setUpMapIfNeeded();
 
+        killLocations = new ArrayList<LatLng>();
+        killInfo = new ArrayList<String>();
+
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
                 killLocations = savedInstanceState.getParcelableArrayList("points");
+                killInfo = savedInstanceState.getStringArrayList("info");
                 if(killLocations!=null){
                     for(int i=0;i<killLocations.size();i++){
                         mMap.addMarker(new MarkerOptions()
                                 .position(killLocations.get(i))
+                                .title("Person Killed")
+                                .snippet(killInfo.get(i))
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
-
                     }
                 }
             }
@@ -93,9 +102,6 @@ public class MapsActivity extends FragmentActivity implements
         }
 
         kill = (Button) findViewById(R.id.killbutton);
-
-        //assumes that there are eight or less players
-        killLocations = new ArrayList<LatLng>();
 
 
         kill.setOnClickListener(new View.OnClickListener() {
@@ -149,8 +155,10 @@ public class MapsActivity extends FragmentActivity implements
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_IN_RESOLUTION, mIsInResolution);
 
-        // Adding the killLocations arraylist to Bundle
+        // Adding the killLocations  and killInfo arraylists to Bundle so
+        //Markers can be reset
         outState.putParcelableArrayList("points", killLocations);
+        outState.putStringArrayList("info", killInfo);
     }
 
 
@@ -313,13 +321,35 @@ public class MapsActivity extends FragmentActivity implements
             //this is used to store each kill location so that they can be
             //reset when orientation changes and updated for other players
 
+            //finds info to use when setting marker message box
+            String killedName = "Sample Name";
+            String otherinfo;
+
+            otherinfo = setMarkerInfo();
+
+
             //adds marker to the map
             mMap.addMarker(new MarkerOptions()
                     .position(geoPos)
+                    .title("Player Killed: " + killedName)
+                    .snippet(otherinfo)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
-
             confirmedKill = false;
         }
+    }
+
+    private String setMarkerInfo(){
+        String info = "";
+        //fill this in when player storage complete
+        info += "Killed by: " + "Me...bwahaha\n";
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        Date date = new Date();
+        info += "Time Killed: " + dateFormat.format(date).toString();
+
+        killInfo.add(info);
+        //stores the kill info at the same index of its arrayList as the location
+
+        return info;
     }
 
 }
