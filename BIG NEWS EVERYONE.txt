@@ -3,3 +3,8 @@ add info activity for a picture and name. It pulls directly from google+ because
 want to cram that crappy social media platform down peoples throat. It works with an invite
 system that is based on your google+ friends and circles. So as of right now I am not making
 the activity because it seems redundent but if you have a better idea then I'll listen.
+
+
+Sounds awesome! I guess I just need to know how the invited players google+ records can be found
+so that I can pull that information in the MapActivity and KillActivity. I'm glad that it's not
+going to be too much work!  -Katherine
