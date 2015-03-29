@@ -7,20 +7,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.google.android.gms.games.Player;
+import com.google.android.gms.games.Players;
 
 
 public class KillActivity extends ActionBarActivity {
 
 
     //allows me to test the map...delete later
-    private Button kill;
+    private ImageView kill;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.killscreen);
 
-        kill = (Button) findViewById(R.id.killButton);
+        kill = (ImageView) findViewById(R.id.gunImage);
 
         kill.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -37,7 +42,6 @@ public class KillActivity extends ActionBarActivity {
         });
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -60,4 +64,5 @@ public class KillActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
