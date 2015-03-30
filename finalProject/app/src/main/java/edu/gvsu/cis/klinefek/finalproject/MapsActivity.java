@@ -83,6 +83,7 @@ public class MapsActivity extends FragmentActivity implements
         killLocations = new ArrayList<LatLng>();
         killInfo = new ArrayList<String>();
         killTitle = new ArrayList<String>();
+        players = new ArrayList<Player>();
 
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
@@ -103,7 +104,7 @@ public class MapsActivity extends FragmentActivity implements
         }
 
 
-        kill = (TextView) findViewById(R.id.kill);
+        kill = (TextView) findViewById(R.id.killbutton);
 
 
         kill.setOnClickListener(new View.OnClickListener() {

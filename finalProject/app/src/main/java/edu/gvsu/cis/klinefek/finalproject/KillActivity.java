@@ -37,6 +37,9 @@ public class KillActivity extends ActionBarActivity {
 
         kill = (ImageView) findViewById(R.id.gunImage);
 
+        //this should be passed as extra once this information is known
+        players = new ArrayList<Player>();
+
         selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
         selectPlayerManager = new LinearLayoutManager(this);
         selectPlayer.setLayoutManager(selectPlayerManager);
