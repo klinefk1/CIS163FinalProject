@@ -11,10 +11,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.Player;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,10 +43,11 @@ public class MapsActivity extends FragmentActivity implements
     private static final String KEY_IN_RESOLUTION = "is_in_resolution";
     private Marker myMarker;
     private boolean confirmedKill = false;
-    private Button kill;
+    private TextView kill;
     private ArrayList<LatLng> killLocations;
     private ArrayList<String> killInfo;
     private ArrayList<String> killTitle;
+    private ArrayList<Player> players;
 
     /**
      * Request code for auto Google Play Services error resolution.
@@ -99,12 +102,8 @@ public class MapsActivity extends FragmentActivity implements
             }
         }
 
-        Intent fromKill = getIntent();
-        if(fromKill.getBooleanExtra("kill", true)){
 
-        }
-
-        kill = (Button) findViewById(R.id.killbutton);
+        kill = (TextView) findViewById(R.id.kill);
 
 
         kill.setOnClickListener(new View.OnClickListener() {
@@ -174,6 +173,9 @@ public class MapsActivity extends FragmentActivity implements
         if (resultCode ==  RESULT_OK && requestCode == 42) {
             //works on the result of the kill activity
             if (data.hasExtra("kill")) {
+                if(data.hasExtra("player")){
+                    //set player value
+                }
                 confirmedKill = data.getBooleanExtra("kill", false);
                 setKillMarker();
             }

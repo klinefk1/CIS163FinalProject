@@ -25,9 +25,6 @@
         android:layout_alignParentEnd="true"
         android:textColor="#ffff0000" />
 
-
-
-
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

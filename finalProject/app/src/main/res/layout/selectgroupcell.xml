@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:weightSum="1"
     android:background="#000000"
-    android:id="@+id/tvcell">
+    android:id="@+id/selectgroupcell">
 
     <LinearLayout
         android:orientation="horizontal"

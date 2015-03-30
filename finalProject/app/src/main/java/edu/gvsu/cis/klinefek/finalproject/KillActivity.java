@@ -3,15 +3,20 @@ package edu.gvsu.cis.klinefek.finalproject;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.Players;
+
+import java.util.ArrayList;
 
 
 public class KillActivity extends ActionBarActivity {
@@ -19,6 +24,11 @@ public class KillActivity extends ActionBarActivity {
 
     //allows me to test the map...delete later
     private ImageView kill;
+    private ArrayList<Player> players;
+
+    private RecyclerView selectPlayer;
+    private RecyclerView.Adapter selectPlayerAdapter;
+    private RecyclerView.LayoutManager selectPlayerManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +36,30 @@ public class KillActivity extends ActionBarActivity {
         setContentView(R.layout.killscreen);
 
         kill = (ImageView) findViewById(R.id.gunImage);
+
+        selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
+        selectPlayerManager = new LinearLayoutManager(this);
+        selectPlayer.setLayoutManager(selectPlayerManager);
+        selectPlayerAdapter = new selectKillAdapter(players, new selectKillAdapter.SelectorListener() {
+            @Override
+            public void onWordSelected(String w) {
+
+                Toast.makeText(getApplicationContext(), "You selected " + w, Toast.LENGTH_LONG).show();
+
+                //this will later launch an intent with the player as an extra.
+
+                Intent launchMap = new Intent();
+                launchMap.putExtra("kill", true);
+                launchMap.putExtra("player", w);
+                setResult(RESULT_OK, launchMap);
+                finish();
+            }
+        });
+
+        selectPlayer.setAdapter(selectPlayerAdapter);
+        selectPlayerAdapter.notifyDataSetChanged();
+
+
 
         kill.setOnClickListener(new View.OnClickListener() {
             @Override
