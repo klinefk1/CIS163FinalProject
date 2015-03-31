@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.Players;
+import com.google.android.gms.games.multiplayer.Invitation;
 
 import java.util.ArrayList;
 
