@@ -96,7 +96,7 @@ public abstract class BaseGameActivity extends FragmentActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        mHelper.nStart(this);
+        mHelper.onStart(this);
     }
 
     @Override
