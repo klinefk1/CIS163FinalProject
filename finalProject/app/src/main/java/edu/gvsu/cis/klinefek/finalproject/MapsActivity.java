@@ -19,7 +19,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesStatusCodes;
-import com.google.android.gms.games.Player;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.OnInvitationReceivedListener;
@@ -195,11 +194,10 @@ public class MapsActivity extends FragmentActivity implements
 //            findViewById(id).setOnClickListener(this);
 //        }
 
+        mGoogleApiClient.connect();
         //eventually may have to include an if to account for orientation change
         // launch the player selection screen
         // minimum: 1 other player; maximum: 3 other players
-        Intent intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 3);
-        startActivityForResult(intent, RC_SELECT_PLAYERS);
 
 
     }
@@ -576,6 +574,7 @@ public class MapsActivity extends FragmentActivity implements
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+
     }
 
     /**
