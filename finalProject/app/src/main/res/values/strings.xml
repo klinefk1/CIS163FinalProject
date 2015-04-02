@@ -6,7 +6,6 @@
     <string name="title_activity_maps">Map</string>
     <string name="maxKills">Max Kills:</string>
     <string name="title_activity_google_play_services">GooglePlayServicesActivity</string>
-    <string name="app_id">793245498264</string>
 
     <string name="signing_in">Signing in with Google</string>
     <string name="signing_out">Signing out</string>
@@ -36,5 +35,9 @@
     <string name="gamehelper_sign_in_failed">Sign in failed</string>
     <string name="gamehelper_app_misconfigured">miscofigured</string>
     <string name="gamehelper_license_failed">liscence falied</string>
+    <string name="single_player">Single Player</string>
+    <string name="single_player_explanation">Single Player Explaination</string>
+    <string name="quick_game">Quick Game</string>
+    <string name="quick_game_explanation">quick game</string>
 
 </resources>

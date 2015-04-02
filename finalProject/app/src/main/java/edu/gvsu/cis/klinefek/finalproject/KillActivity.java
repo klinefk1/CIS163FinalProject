@@ -17,6 +17,8 @@ import com.google.android.gms.games.Player;
 import com.google.android.gms.games.Players;
 import com.google.android.gms.games.multiplayer.Invitation;
 
+import edu.gvsu.cis.klinefek.finalproject.BaseGameUtils;
+
 import java.util.ArrayList;
 
 
