@@ -944,7 +944,7 @@ public class MapsActivity extends FragmentActivity implements
 
     // This array lists all the individual screens our game has.
     final static int[] SCREENS = {
-            R.id.screen_game, R.layout.mapdisplay, R.id.screen_sign_in,
+            R.id.screen_game, R.id.screen_main, R.id.screen_sign_in,
             R.id.screen_wait
     };
     int mCurScreen = -1;
