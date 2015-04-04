@@ -57,9 +57,16 @@ import com.google.android.gms.plus.Plus;
 
 import org.w3c.dom.Text;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -201,20 +208,26 @@ public class MapsActivity extends FragmentActivity implements
                 Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
                         " is being sent for confirmation.", Toast.LENGTH_LONG).show();
                 //need to make it send out a message to killed player for confirmation
-
-
-                //when confirmation received display this or failed to kill message
-                Toast.makeText(getApplicationContext(), w + "was killed. " + w, Toast.LENGTH_LONG).show();
-
-                String myName = "Error";
+                Participant playerKilled = null;
                 for (Participant p: players){
                     if (p.getParticipantId().equals(mMyId)){
-                        myName = p.getDisplayName();
+                        playerKilled = p;
                         break;
                     }
                 }
-                setKillMarker(myName, w);
-                //also need to send kill marker to all other players
+
+
+                if (playerKilled != null) {
+                    mMsgBuf[0] = 'K';
+                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                            mRoomId, playerKilled.getParticipantId());
+                }
+                else
+                    Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
+
+
+
+
 
             }
         });
@@ -890,7 +903,7 @@ public class MapsActivity extends FragmentActivity implements
 
 
     //sets a marker at the location of a kill.  Should later record information about it
-    //once the add players and store info about players datapase is set up
+    //once the add players and store info about players database is set up
     private void setKillMarker(String killer, String killed){
         if(confirmedKill){
             LatLng geoPos = new LatLng(myMarker.getPosition().latitude, myMarker.getPosition().longitude);
@@ -905,7 +918,15 @@ public class MapsActivity extends FragmentActivity implements
             otherinfo = setMarkerInfo();
             killedName = setMarkerInfo2(killer, killed);
 
+            byte killedIndex = 0;
+            for (int i = 0; i < players.size(); i++){
+                if (players.get(i).getDisplayName().equals(killed)){
+                    killedIndex = (byte) i;
+                    break;
+                }
+            }
 
+            byte[] loc = latLngToByteArray(geoPos);
 
             //adds marker to the map
             mMap.addMarker(new MarkerOptions()
@@ -914,10 +935,54 @@ public class MapsActivity extends FragmentActivity implements
                     .snippet(otherinfo)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
             confirmedKill = false;
+
+
+            byte[] message = new byte[2 + loc.length];
+            message[0] = 'S';
+            message[1] = killedIndex;
+            for(int i = 0; i < loc.length; i++){
+                message[i+2] = loc[i];
+            }
+
+            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
         }
     }
 
 
+    public byte[] latLngToByteArray (LatLng obj)
+    {
+        byte[] bytes = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(obj);
+            oos.flush();
+            oos.close();
+            bos.close();
+            bytes = bos.toByteArray ();
+        }
+        catch (IOException ex) {
+            //TODO: Handle the exception
+        }
+        return bytes;
+    }
+
+    public Object latLngToObject (byte[] bytes)
+    {
+        Object obj = null;
+        try {
+            ByteArrayInputStream bis = new ByteArrayInputStream (Arrays.copyOfRange(bytes, 2, bytes.length));
+            ObjectInputStream ois = new ObjectInputStream (bis);
+            obj = ois.readObject();
+        }
+        catch (IOException ex) {
+            //TODO: Handle the exception
+        }
+        catch (ClassNotFoundException ex) {
+            //TODO: Handle the exception
+        }
+        return obj;
+    }
 
     private String setMarkerInfo(){
         String info = "";
@@ -969,30 +1034,56 @@ public class MapsActivity extends FragmentActivity implements
         String sender = rtm.getSenderParticipantId();
         Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
 
-        if (buf[0] == 'F' || buf[0] == 'U') {
-            // score update.
-            int existingScore = mParticipantScore.containsKey(sender) ?
-                    mParticipantScore.get(sender) : 0;
-            int thisScore = (int) buf[1];
-            if (thisScore > existingScore) {
-                // this check is necessary because packets may arrive out of
-                // order, so we
-                // should only ever consider the highest score we received, as
-                // we know in our
-                // game there is no way to lose points. If there was a way to
-                // lose points,
-                // we'd have to add a "serial number" to the packet.
-                mParticipantScore.put(sender, thisScore);
+        if (buf[0] == 'K') {                //receiving message to confirm a kill
+
+            }
+        else if(buf[0] == 'A'){             //receiving message that kill is accepted
+            String senderName = "Anonymous";
+            for(Participant p : players){
+                if(p.getParticipantId().equals(sender)){
+                    senderName = p.getDisplayName();
+                }
+            }
+            Toast.makeText(getApplicationContext(), senderName + " was killed.", Toast.LENGTH_LONG).show();
+
+
+            String myName = "Error";
+            for (Participant p: players){
+                if (p.getParticipantId().equals(mMyId)){
+                    myName = p.getDisplayName();
+                    break;
+                }
+            }
+            setKillMarker(myName, senderName);
+
+        }
+        else if(buf[0] == 'D'){             //receiving message that kill is declined
+            Toast.makeText(getApplicationContext(), "The player did not confirm the kill.",
+                    Toast.LENGTH_LONG).show();
+        }
+        else if(buf[0] == 'S'){             //message received to all players set new kill marker
+            int killedPlayerIndex = buf[1];
+            LatLng geoPos = (LatLng) latLngToObject(buf);
+
+            String killedName;
+            String otherinfo;
+
+            String senderName = "Anonymous";
+            for(Participant p : players){
+                if(p.getParticipantId().equals(sender)){
+                    senderName = p.getDisplayName();
+                }
             }
 
-            // update the scores on the screen
-            updatePeerScoresDisplay();
+            otherinfo = setMarkerInfo();
+            killedName = setMarkerInfo2(senderName, players.get(killedPlayerIndex).getDisplayName());
 
-            // if it's a final score, mark this participant as having finished
-            // the game
-            if ((char) buf[0] == 'F') {
-                mFinishedParticipants.add(rtm.getSenderParticipantId());
-            }
+            mMap.addMarker(new MarkerOptions()
+                    .position(geoPos)
+                    .title(killedName)
+                    .snippet(otherinfo)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
+
         }
     }
 
@@ -1001,7 +1092,7 @@ public class MapsActivity extends FragmentActivity implements
         if (!mMultiplayer)
             return; // playing single-player mode
 
-        // First byte in message indicates whether it's a final score or not
+        // First byte in message indicates what the message refers to
         mMsgBuf[0] = (byte) (finalScore ? 'F' : 'U');
 
         // Second byte is the score.
