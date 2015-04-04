@@ -2,27 +2,19 @@ package edu.gvsu.cis.klinefek.finalproject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
-import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,11 +47,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
 
-import org.w3c.dom.Text;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -224,11 +213,6 @@ public class MapsActivity extends FragmentActivity implements
                 }
                 else
                     Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
-
-
-
-
-
             }
         });
 
@@ -381,16 +365,6 @@ public class MapsActivity extends FragmentActivity implements
         }
 
 
-
-//        else {
-//            super.onActivityResult(requestCode, resultCode, data);
-//            switch (requestCode) {
-//                case REQUEST_CODE_RESOLUTION:
-//                    retryConnecting();
-//                    break;
-//            }
-//        }
-
     }
 
     // Handle the result of the "Select players UI" we launched when the user clicked the
@@ -509,10 +483,7 @@ public class MapsActivity extends FragmentActivity implements
                     })
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
-
-
             return leave[0];
-
         }
         return super.onKeyDown(keyCode, e);
     }
@@ -614,8 +585,6 @@ public class MapsActivity extends FragmentActivity implements
             }
         }
         switchToScreen(R.id.screen_main);
-
-
     }
 
 
@@ -705,10 +674,7 @@ public class MapsActivity extends FragmentActivity implements
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                //setUpMap();
-            }
+
         }
     }
 
@@ -718,9 +684,7 @@ public class MapsActivity extends FragmentActivity implements
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
-//    private void setUpMap() {
-//        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-//    }
+
 
     @Override
     public void onLocationChanged(Location location) {
@@ -731,11 +695,10 @@ public class MapsActivity extends FragmentActivity implements
                 .build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(campos));
         if (myMarker == null) /*if we don't have a marker yet, create and add */ {
-            myMarker = mMap.addMarker(new MarkerOptions().position(geoPos));
+            myMarker = mMap.addMarker(new MarkerOptions().position(geoPos)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher))
+                    .title("My Location"));
 
-            //hides the marker itself...may or may not keep this
-            //depending on if it can be hidden from all players except this player
-            myMarker.setVisible(false);
         }
         else
             myMarker.setPosition(geoPos);
@@ -874,9 +837,6 @@ public class MapsActivity extends FragmentActivity implements
         if (room != null) {
             players = room.getParticipants();
         }
-        if (players != null) {
-            updateMapForEveryone();
-        }
     }
 
     /*
@@ -887,11 +847,6 @@ public class MapsActivity extends FragmentActivity implements
     // Start the gameplay phase of the game.
     void startGame(boolean multiplayer) {
         switchToScreen(R.layout.mapdisplay);
-    }
-
-    private void updateMapForEveryone(){
-        //logic that passes the new marker to the
-        //other players and puts it on their map
     }
 
     // Reset game variables in preparation for a new game.
@@ -1113,36 +1068,6 @@ public class MapsActivity extends FragmentActivity implements
         }
     }
 
-    // Broadcast my score to everybody else.
-    void broadcastScore(boolean finalScore) {
-        if (!mMultiplayer)
-            return; // playing single-player mode
-
-        // First byte in message indicates what the message refers to
-        mMsgBuf[0] = (byte) (finalScore ? 'F' : 'U');
-
-        // Second byte is the score.
-        mMsgBuf[1] = (byte) 0;
-        //this should actually send markers
-
-        // Send to every other participant.
-        for (Participant p : players) {
-            if (p.getParticipantId().equals(mMyId))
-                continue;
-            if (p.getStatus() != Participant.STATUS_JOINED)
-                continue;
-            if (finalScore) {
-                // final score notification must be sent via reliable message
-                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
-                        mRoomId, p.getParticipantId());
-            } else {
-                // it's an interim score notification, so we can use unreliable
-                Games.RealTimeMultiplayer.sendUnreliableMessage(mGoogleApiClient, mMsgBuf, mRoomId,
-                        p.getParticipantId());
-            }
-        }
-    }
-
 
     /*
      * UI SECTION. Methods that implement the game's UI.
@@ -1188,19 +1113,6 @@ public class MapsActivity extends FragmentActivity implements
         }
     }
 
-
-    // formats a score as a three-digit number
-    String formatScore(int i) {
-        if (i < 0)
-            i = 0;
-        String s = String.valueOf(i);
-        return s.length() == 1 ? "00" + s : s.length() == 2 ? "0" + s : s;
-    }
-
-    // updates the screen with the scores from our peers
-    void updatePeerScoresDisplay() {
-        //switch this to update the map
-    }
 
 
     /*
@@ -1265,12 +1177,6 @@ public class MapsActivity extends FragmentActivity implements
                 mGoogleApiClient.disconnect();
                 switchToScreen(R.id.screen_sign_in);
                 break;
-//            case R.id.button_invite_players:
-//                // show list of invitable players
-//                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 3);
-//                switchToScreen(R.id.screen_wait);
-//                startActivityForResult(intent, RC_SELECT_PLAYERS);
-//                break;
             case R.id.button_see_invitations:
                 // show list of pending invitations
                 intent = Games.Invitations.getInvitationInboxIntent(mGoogleApiClient);
@@ -1283,14 +1189,6 @@ public class MapsActivity extends FragmentActivity implements
                 acceptInviteToRoom(mIncomingInvitationId);
                 mIncomingInvitationId = null;
                 break;
-//            case R.id.button_quick_game:
-//                // user wants to play against a random opponent right now
-//                //startQuickGame();
-//                break;
-//            case R.id.button_click_me:
-//                // (gameplay) user clicked the "click me" button
-//                //scoreOnePoint();
-//                break;
         }
     }
 
