@@ -202,6 +202,7 @@ public class MapsActivity extends FragmentActivity implements
                         " is being sent for confirmation.", Toast.LENGTH_LONG).show();
                 //need to make it send out a message to killed player for confirmation
 
+
                 //when confirmation received display this or failed to kill message
                 Toast.makeText(getApplicationContext(), w + "was killed. " + w, Toast.LENGTH_LONG).show();
 
@@ -872,7 +873,7 @@ public class MapsActivity extends FragmentActivity implements
 
     // Start the gameplay phase of the game.
     void startGame(boolean multiplayer) {
-
+        switchToScreen(R.layout.mapdisplay);
     }
 
     private void updateMapForEveryone(){
