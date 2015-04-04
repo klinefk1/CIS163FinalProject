@@ -102,7 +102,11 @@ public abstract class BaseGameActivity extends FragmentActivity implements
     @Override
     protected void onStop() {
         super.onStop();
-        mHelper.onStop();
+
+        //disabled in order to keep connected in background so player can
+        //answer phone or do other tasks.
+
+        //mHelper.onStop();
     }
 
     @Override

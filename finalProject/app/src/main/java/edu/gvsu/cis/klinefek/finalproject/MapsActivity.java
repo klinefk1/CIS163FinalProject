@@ -293,10 +293,11 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     protected void onStart() {
         switchToScreen(R.id.screen_wait);
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            Log.w(TAG,
-                    "GameHelper: client was already connected on onStart()");
-        } else {
+//        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+//            Log.w(TAG,
+//                    "GameHelper: client was already connected on onStart()");
+        if (mGoogleApiClient == null || !mGoogleApiClient.isConnected())
+        {
             Log.d(TAG,"Connecting client.");
             mGoogleApiClient.connect();
         }
@@ -433,8 +434,7 @@ public class MapsActivity extends FragmentActivity implements
     public void onStop() {
         Log.d(TAG, "**** got onStop");
 
-        // if we're in a room, leave it.
-        leaveRoom();
+
 
         // stop trying to keep the screen on
         stopKeepingScreenOn();
@@ -442,9 +442,9 @@ public class MapsActivity extends FragmentActivity implements
         if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()){
             switchToScreen(R.id.screen_sign_in);
         }
-        else {
-            switchToScreen(R.id.screen_wait);
-        }
+//        else {
+//            switchToScreen(R.id.screen_wait);
+//        }
         super.onStop();
 
     }
@@ -460,6 +460,13 @@ public class MapsActivity extends FragmentActivity implements
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_game) {
             leaveRoom();
             return true;
+        }
+        else if(keyCode == KeyEvent.KEYCODE_BACK && killDisplay.getVisibility() == View.VISIBLE){
+            killDisplay.setVisibility(View.GONE);
+            returnToMap.setVisibility(View.GONE);
+            mapDisplay.setVisibility(View.VISIBLE);
+            kill.setVisibility(View.VISIBLE);
+            return false;
         }
         else if (keyCode == KeyEvent.KEYCODE_BACK) {
             final boolean[] leave = new boolean[1];
@@ -651,6 +658,7 @@ public class MapsActivity extends FragmentActivity implements
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+        switchToScreen(R.layout.mapdisplay);
 
     }
 
