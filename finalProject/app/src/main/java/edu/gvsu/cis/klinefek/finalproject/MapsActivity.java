@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -57,7 +59,7 @@ public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         com.google.android.gms.location.LocationListener,
         RoomUpdateListener, RealTimeMessageReceivedListener, RoomStatusUpdateListener,
-        OnInvitationReceivedListener{
+        OnInvitationReceivedListener, View.OnClickListener{
 
     //instance for map
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -72,6 +74,13 @@ public class MapsActivity extends FragmentActivity implements
 
 
     //instance for multiplayer API
+
+    // This array lists everything that's clickable, so we can install click
+    // event handlers.
+    final static int[] CLICKABLES = {
+            R.id.button_accept_popup_invitation,
+            R.id.button_see_invitations, R.id.freeForAll, R.id.bountyHunter
+    };
 
 
     // Request codes for the UIs that we show with startActivityForResult:
@@ -185,20 +194,19 @@ public class MapsActivity extends FragmentActivity implements
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
                 .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();
 
         // set up a click listener for everything we care about
-//        for (int id : CLICKABLES) {
-//            findViewById(id).setOnClickListener(this);
-//        }
+        for (int id : CLICKABLES) {
+            findViewById(id).setOnClickListener(this);
+        }
+
 
         mGoogleApiClient.connect();
         //eventually may have to include an if to account for orientation change
-        // launch the player selection screen
-        // minimum: 1 other player; maximum: 3 other players
-
 
     }
 
@@ -220,18 +228,18 @@ public class MapsActivity extends FragmentActivity implements
             mGoogleApiClient.connect();
         }
         super.onStart();
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    // Optionally, add additional APIs and scopes if required.
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-                    .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                    .build();
-
-        }
-        mGoogleApiClient.connect();
+//        if (mGoogleApiClient == null) {
+//            mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                    // Optionally, add additional APIs and scopes if required.
+//                    .addConnectionCallbacks(this)
+//                    .addOnConnectionFailedListener(this)
+//                    .addApi(LocationServices.API)
+//                    .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
+//                    .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+//                    .build();
+//
+//        }
+//        mGoogleApiClient.connect();
 
 
     }
@@ -505,7 +513,7 @@ public class MapsActivity extends FragmentActivity implements
                 return;
             }
         }
-        switchToMainScreen();
+        switchToScreen(R.id.screen_main);
 
 
     }
@@ -934,12 +942,7 @@ public class MapsActivity extends FragmentActivity implements
      * UI SECTION. Methods that implement the game's UI.
      */
 
-    // This array lists everything that's clickable, so we can install click
-    // event handlers.
-    final static int[] CLICKABLES = {
-            R.id.button_accept_popup_invitation, R.id.button_invite_players,
-            R.id.button_see_invitations,
-    };
+
 
     // This array lists all the individual screens our game has.
     final static int[] SCREENS = {
@@ -991,9 +994,6 @@ public class MapsActivity extends FragmentActivity implements
     // updates the screen with the scores from our peers
     void updatePeerScoresDisplay() {
         //switch this to update the map
-
-
-
     }
 
 
@@ -1014,5 +1014,75 @@ public class MapsActivity extends FragmentActivity implements
     // Clears the flag that keeps the screen on.
     void stopKeepingScreenOn() {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent intent;
+
+        switch (v.getId()) {
+            case R.id.freeForAll:
+                // show list of invitable players
+                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 3);
+                switchToScreen(R.id.screen_wait);
+                startActivityForResult(intent, RC_SELECT_PLAYERS);
+                break;
+            case R.id.bountyHunter:
+                // play a single-player game
+                // show list of invitable players
+                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 3);
+                switchToScreen(R.id.screen_wait);
+                startActivityForResult(intent, RC_SELECT_PLAYERS);
+                break;
+            case R.id.button_sign_in:
+                // user wants to sign in
+                // Check to see the developer who's running this sample code read the instructions :-)
+                // NOTE: this check is here only because this is a sample! Don't include this
+                // check in your actual production app.
+                if (!BaseGameUtils.verifySampleSetup(this, R.string.app_id)) {
+                    Log.w(TAG, "*** Warning: setup problems detected. Sign in may not work!");
+                }
+
+                // start the sign-in flow
+                Log.d(TAG, "Sign-in button clicked");
+                mSignInClicked = true;
+                mGoogleApiClient.connect();
+                break;
+            case R.id.button_sign_out:
+                // user wants to sign out
+                // sign out.
+                Log.d(TAG, "Sign-out button clicked");
+                mSignInClicked = false;
+                Games.signOut(mGoogleApiClient);
+                mGoogleApiClient.disconnect();
+                switchToScreen(R.id.screen_sign_in);
+                break;
+//            case R.id.button_invite_players:
+//                // show list of invitable players
+//                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 3);
+//                switchToScreen(R.id.screen_wait);
+//                startActivityForResult(intent, RC_SELECT_PLAYERS);
+//                break;
+            case R.id.button_see_invitations:
+                // show list of pending invitations
+                intent = Games.Invitations.getInvitationInboxIntent(mGoogleApiClient);
+                switchToScreen(R.id.screen_wait);
+                startActivityForResult(intent, RC_INVITATION_INBOX);
+                break;
+            case R.id.button_accept_popup_invitation:
+                // user wants to accept the invitation shown on the invitation popup
+                // (the one we got through the OnInvitationReceivedListener).
+                acceptInviteToRoom(mIncomingInvitationId);
+                mIncomingInvitationId = null;
+                break;
+//            case R.id.button_quick_game:
+//                // user wants to play against a random opponent right now
+//                //startQuickGame();
+//                break;
+//            case R.id.button_click_me:
+//                // (gameplay) user clicked the "click me" button
+//                //scoreOnePoint();
+//                break;
+        }
     }
 }
