@@ -1035,7 +1035,33 @@ public class MapsActivity extends FragmentActivity implements
         Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
 
         if (buf[0] == 'K') {                //receiving message to confirm a kill
-
+            String senderName = "Anonymous";
+            final String sendTo = sender;
+            for(Participant p : players){
+                if(p.getParticipantId().equals(sender)){
+                    senderName = p.getDisplayName();
+                }
+            }
+            new AlertDialog.Builder(this)
+                    .setTitle("Kill Confirmation")
+                    .setMessage(senderName + " claims he/she has killed you. " +
+                    "Is this true?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            mMsgBuf[0] = 'A';
+                            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                    mRoomId, sendTo);
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            mMsgBuf[0] = 'D';
+                            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                    mRoomId, sendTo);
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
             }
         else if(buf[0] == 'A'){             //receiving message that kill is accepted
             String senderName = "Anonymous";
