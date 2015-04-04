@@ -1,10 +1,13 @@
 package edu.gvsu.cis.klinefek.finalproject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -52,6 +55,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
 
+import org.w3c.dom.Text;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -77,13 +82,15 @@ public class MapsActivity extends FragmentActivity implements
     private Marker myMarker;
     private boolean confirmedKill = false;
     private TextView kill;
+    private TextView returnToMap;
     private ArrayList<LatLng> killLocations;
     private ArrayList<String> killInfo;
     private ArrayList<String> killTitle;
 
     //game logic
     private int gameMode = 0;  //0 = not selected, 1 = free-for-all, 2 = bounty hunter
-    private FrameLayout mainDisplay;
+    private FrameLayout mapDisplay;
+    private FrameLayout killDisplay;
     private RecyclerView selectPlayer;
     private RecyclerView.Adapter selectPlayerAdapter;
     private RecyclerView.LayoutManager selectPlayerManager;
@@ -131,6 +138,7 @@ public class MapsActivity extends FragmentActivity implements
     // My participant ID in the currently active game
     String mMyId = null;
 
+
     // If non-null, this is the id of the invitation we received via the
     // invitation listener
     String mIncomingInvitationId = null;
@@ -172,12 +180,46 @@ public class MapsActivity extends FragmentActivity implements
         setContentView(R.layout.mapdisplay);
         setUpMapIfNeeded();
 
+        kill = (TextView) findViewById(R.id.killbutton);
+        returnToMap = (TextView) findViewById(R.id.returnToMap);
+
         killLocations = new ArrayList<LatLng>();
         killInfo = new ArrayList<String>();
         killTitle = new ArrayList<String>();
         players = new ArrayList<Participant>();
+        mapDisplay = (FrameLayout) findViewById(R.id.mapfrag);
+        killDisplay = (FrameLayout) findViewById(R.id.killfrag);
 
-        mainDisplay = (FrameLayout) findViewById(R.id.mapfrag);
+        //sets adapter when kill is clicked
+        selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
+        selectPlayerManager = new LinearLayoutManager(this);
+        selectPlayer.setLayoutManager(selectPlayerManager);
+        selectPlayerAdapter = new selectKillAdapter(players, new selectKillAdapter.SelectorListener() {
+            @Override
+            public void onWordSelected(String w) {
+
+                Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
+                        " is being sent for confirmation.", Toast.LENGTH_LONG).show();
+                //need to make it send out a message to killed player for confirmation
+
+                //when confirmation received display this or failed to kill message
+                Toast.makeText(getApplicationContext(), w + "was killed. " + w, Toast.LENGTH_LONG).show();
+
+                String myName = "Error";
+                for (Participant p: players){
+                    if (p.getParticipantId().equals(mMyId)){
+                        myName = p.getDisplayName();
+                        break;
+                    }
+                }
+                setKillMarker(myName, w);
+                //also need to send kill marker to all other players
+
+            }
+        });
+
+        selectPlayer.setAdapter(selectPlayerAdapter);
+        selectPlayerAdapter.notifyDataSetChanged();
 
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
@@ -197,7 +239,31 @@ public class MapsActivity extends FragmentActivity implements
             }
         }
 
+        kill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //switch from map to recyclerView
+                mapDisplay.setVisibility(View.GONE);
+                kill.setVisibility(View.GONE);
+                killDisplay.setVisibility(View.VISIBLE);
+                returnToMap.setVisibility(View.VISIBLE);
 
+                //need to remember to put a popup in for back button
+                //to let players know that it will make them leave the game
+                //which asks for confirmation
+            }
+        });
+
+        returnToMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //switch from map to recyclerView
+                killDisplay.setVisibility(View.GONE);
+                returnToMap.setVisibility(View.GONE);
+                mapDisplay.setVisibility(View.VISIBLE);
+                kill.setVisibility(View.VISIBLE);
+            }
+        });
 
         // Create the Google Api Client with access to Plus and Games
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -398,12 +464,45 @@ public class MapsActivity extends FragmentActivity implements
     // Handle back key to make sure we cleanly leave a game if we are in the middle of one
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent e) {
+
+        //fix this later...right now it only returns false
+        //which I believe is an async issue
+        //(returns before dialog is complete)
+
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_game) {
             leaveRoom();
             return true;
         }
+        else if (keyCode == KeyEvent.KEYCODE_BACK) {
+            final boolean[] leave = new boolean[1];
+            new AlertDialog.Builder(this)
+                    .setTitle("Leaving game")
+                    .setMessage("Pressing back and returning to the " +
+                        " home screen will cause you to forfeit the match. Would " +
+                        "you like to continue?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // leave the match
+                            leaveRoom();
+                            leave[0] = true;
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                            leave[0] = false;
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+
+
+            return leave[0];
+
+        }
         return super.onKeyDown(keyCode, e);
     }
+
 
 
     // Leave the room.
