@@ -5,15 +5,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -27,6 +35,7 @@ import com.google.android.gms.games.multiplayer.OnInvitationReceivedListener;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessageReceivedListener;
+import com.google.android.gms.games.multiplayer.realtime.RealTimeMultiplayer;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
@@ -59,7 +68,7 @@ public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         com.google.android.gms.location.LocationListener,
         RoomUpdateListener, RealTimeMessageReceivedListener, RoomStatusUpdateListener,
-        OnInvitationReceivedListener, View.OnClickListener{
+        OnInvitationReceivedListener, View.OnClickListener, RealTimeMultiplayer.ReliableMessageSentCallback{
 
     //instance for map
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -72,6 +81,14 @@ public class MapsActivity extends FragmentActivity implements
     private ArrayList<String> killInfo;
     private ArrayList<String> killTitle;
 
+    //game logic
+    private int gameMode = 0;  //0 = not selected, 1 = free-for-all, 2 = bounty hunter
+    private FrameLayout mainDisplay;
+    private RecyclerView selectPlayer;
+    private RecyclerView.Adapter selectPlayerAdapter;
+    private RecyclerView.LayoutManager selectPlayerManager;
+    private int numberOfKills = 0;
+    private int gameResult = 0; //0 for in progress, 1 for win, 2 for lose
 
     //instance for multiplayer API
 
@@ -160,6 +177,8 @@ public class MapsActivity extends FragmentActivity implements
         killTitle = new ArrayList<String>();
         players = new ArrayList<Participant>();
 
+        mainDisplay = (FrameLayout) findViewById(R.id.mapfrag);
+
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
@@ -179,16 +198,6 @@ public class MapsActivity extends FragmentActivity implements
         }
 
 
-        kill = (TextView) findViewById(R.id.killbutton);
-
-
-        kill.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent act = new Intent(MapsActivity.this, KillActivity.class);
-                startActivityForResult(act, 42);
-            }
-        });
 
         // Create the Google Api Client with access to Plus and Games
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -228,19 +237,6 @@ public class MapsActivity extends FragmentActivity implements
             mGoogleApiClient.connect();
         }
         super.onStart();
-//        if (mGoogleApiClient == null) {
-//            mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                    // Optionally, add additional APIs and scopes if required.
-//                    .addConnectionCallbacks(this)
-//                    .addOnConnectionFailedListener(this)
-//                    .addApi(LocationServices.API)
-//                    .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-//                    .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-//                    .build();
-//
-//        }
-//        mGoogleApiClient.connect();
-
 
     }
 
@@ -304,16 +300,7 @@ public class MapsActivity extends FragmentActivity implements
                 break;
         }
 
-        if (resultCode ==  RESULT_OK && requestCode == 42) {
-            //works on the result of the kill activity
-            if (data.hasExtra("kill")) {
-                if(data.hasExtra("player")){
-                    //set player value
-                }
-                confirmedKill = data.getBooleanExtra("kill", false);
-                setKillMarker();
-            }
-        }
+
 
 //        else {
 //            super.onActivityResult(requestCode, resultCode, data);
@@ -587,8 +574,7 @@ public class MapsActivity extends FragmentActivity implements
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * installed) and the map has not already been instantiated..
      * <p/>
      * If it isn't installed {@link SupportMapFragment} (and
      * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
@@ -805,7 +791,7 @@ public class MapsActivity extends FragmentActivity implements
 
     //sets a marker at the location of a kill.  Should later record information about it
     //once the add players and store info about players datapase is set up
-    private void setKillMarker(){
+    private void setKillMarker(String killer, String killed){
         if(confirmedKill){
             LatLng geoPos = new LatLng(myMarker.getPosition().latitude, myMarker.getPosition().longitude);
             killLocations.add(geoPos);
@@ -817,7 +803,7 @@ public class MapsActivity extends FragmentActivity implements
             String otherinfo;
 
             otherinfo = setMarkerInfo();
-            killedName = setMarkerInfo2();
+            killedName = setMarkerInfo2(killer, killed);
 
 
 
@@ -832,6 +818,7 @@ public class MapsActivity extends FragmentActivity implements
     }
 
 
+
     private String setMarkerInfo(){
         String info = "";
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
@@ -844,16 +831,18 @@ public class MapsActivity extends FragmentActivity implements
         return info;
     }
 
-    private String setMarkerInfo2(){
+    private String setMarkerInfo2(String killer, String killed){
         String info = "";
         //fill this in when player storage complete
-        info += "Player" +" was killed by " + "me";
+
+        info = killed + " was killed by " + killer;
 
         killTitle.add(info);
         //stores the kill info at the same index of its arrayList as the location
 
         return info;
     }
+
 
 
     /*
@@ -1023,16 +1012,18 @@ public class MapsActivity extends FragmentActivity implements
         switch (v.getId()) {
             case R.id.freeForAll:
                 // show list of invitable players
-                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 3);
+                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 7);
                 switchToScreen(R.id.screen_wait);
                 startActivityForResult(intent, RC_SELECT_PLAYERS);
+                gameMode = 1;
                 break;
             case R.id.bountyHunter:
                 // play a single-player game
                 // show list of invitable players
-                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 3);
+                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 7);
                 switchToScreen(R.id.screen_wait);
                 startActivityForResult(intent, RC_SELECT_PLAYERS);
+                gameMode = 2;
                 break;
             case R.id.button_sign_in:
                 // user wants to sign in
@@ -1084,5 +1075,10 @@ public class MapsActivity extends FragmentActivity implements
 //                //scoreOnePoint();
 //                break;
         }
+    }
+
+    @Override
+    public void onRealTimeMessageSent(int i, int i2, String s) {
+
     }
 }

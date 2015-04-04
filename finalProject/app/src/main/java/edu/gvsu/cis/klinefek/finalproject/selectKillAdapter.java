@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.games.Player;
+import com.google.android.gms.games.multiplayer.Participant;
 
 
 import java.util.ArrayList;
@@ -19,11 +20,11 @@ import java.util.ArrayList;
  */
 public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
-    private ArrayList<Player> players;
+    private ArrayList<Participant> players;
     private SelectorListener listener;
 
 
-    public selectKillAdapter(ArrayList<Player> gamePlayers, SelectorListener listener){
+    public selectKillAdapter(ArrayList<Participant> gamePlayers, SelectorListener listener){
         players = gamePlayers;
     }
 

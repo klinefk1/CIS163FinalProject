@@ -8,16 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.games.Player;
-import com.google.android.gms.games.Players;
-import com.google.android.gms.games.multiplayer.Invitation;
 
-import edu.gvsu.cis.klinefek.finalproject.BaseGameUtils;
+import com.google.android.gms.games.multiplayer.Participant;
+
+
 
 import java.util.ArrayList;
 
@@ -27,7 +24,7 @@ public class KillActivity extends ActionBarActivity {
 
     //allows me to test the map...delete later
     private ImageView kill;
-    private ArrayList<Player> players;
+    private ArrayList<Participant> players;
 
     private RecyclerView selectPlayer;
     private RecyclerView.Adapter selectPlayerAdapter;
@@ -41,7 +38,7 @@ public class KillActivity extends ActionBarActivity {
         kill = (ImageView) findViewById(R.id.gunImage);
 
         //this should be passed as extra once this information is known
-        players = new ArrayList<Player>();
+        players = new ArrayList<Participant>();
 
         selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
         selectPlayerManager = new LinearLayoutManager(this);
