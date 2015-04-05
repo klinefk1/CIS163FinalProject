@@ -83,6 +83,7 @@ public class MapsActivity extends FragmentActivity implements
     private ArrayList<String> killInfo;
     private ArrayList<String> killTitle;
 
+
     //game logic
     private int gameMode = 0;  //0 = not selected, 1 = free-for-all, 2 = bounty hunter
     private FrameLayout mapDisplay;
@@ -90,8 +91,10 @@ public class MapsActivity extends FragmentActivity implements
     private RecyclerView selectPlayer;
     private RecyclerView.Adapter selectPlayerAdapter;
     private RecyclerView.LayoutManager selectPlayerManager;
-    private int numberOfKills = 0;
-    private int gameResult = 0; //0 for in progress, 1 for win, 2 for lose
+    private int numberOfKills;
+    private ArrayList<Integer> gameResults; //0 for in progress, 1 for win, 2 for lose
+                                        //the index number is the same index number
+                                        //of the cooresponding participant
 
     //instance for multiplayer API
 
@@ -218,10 +221,13 @@ public class MapsActivity extends FragmentActivity implements
 
         selectPlayer.setAdapter(selectPlayerAdapter);
         selectPlayerAdapter.notifyDataSetChanged();
+        numberOfKills = 0;
 
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
+                gameResults = savedInstanceState.getIntegerArrayList("r'esults");
+                numberOfKills = savedInstanceState.getInt("numberOfKills");
                 killLocations = savedInstanceState.getParcelableArrayList("points");
                 killInfo = savedInstanceState.getStringArrayList("info");
                 killTitle = savedInstanceState.getStringArrayList("title");
@@ -318,6 +324,8 @@ public class MapsActivity extends FragmentActivity implements
         outState.putParcelableArrayList("points", killLocations);
         outState.putStringArrayList("info", killInfo);
         outState.putStringArrayList("title", killTitle);
+        outState.putIntegerArrayList("results", gameResults);
+        outState.putInt("numberOfKills", numberOfKills);
     }
 
 
@@ -803,6 +811,11 @@ public class MapsActivity extends FragmentActivity implements
         players = room.getParticipants();
         mMyId = room.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient));
 
+        gameResults = new ArrayList<Integer>();
+        for(Participant p : players){
+            gameResults.add(0);             //indicates active player
+        }
+
         // print out the list of participants (for debug purposes)
         Log.d(TAG, "Room ID: " + mRoomId);
         Log.d(TAG, "My ID " + mMyId);
@@ -971,6 +984,23 @@ public class MapsActivity extends FragmentActivity implements
         return info;
     }
 
+    private void checkGameOver(){
+        if(killInfo.size() == players.size() - 1){
+            //game is over
+            //return intent to final screen
+            for(int p = 0; p < players.size(); p++){
+                if(mMyId == players.get(p).getParticipantId()){
+                    gameResults.set(p, 1); //indicates won game
+                }
+            }
+            Toast.makeText(getApplicationContext(), "Game over", Toast.LENGTH_LONG).show();
+        }
+        else{
+            int playersLeft = killInfo.size() - players.size() - 1;
+
+            Toast.makeText(getApplicationContext(), playersLeft + " players left  to kill.", Toast.LENGTH_LONG).show();
+        }
+    }
 
 
     /*
@@ -1033,6 +1063,8 @@ public class MapsActivity extends FragmentActivity implements
                     senderName = p.getDisplayName();
                 }
             }
+            numberOfKills++;
+            confirmedKill = true;
             Toast.makeText(getApplicationContext(), senderName + " was killed.", Toast.LENGTH_LONG).show();
 
 
@@ -1044,6 +1076,15 @@ public class MapsActivity extends FragmentActivity implements
                 }
             }
             setKillMarker(myName, senderName);
+
+            for(int p = 0; p < players.size(); p++){
+                if(mMyId == players.get(p).getParticipantId()){
+                    gameResults.set(p, 2); //indicates lost game
+                }
+            }
+
+            Toast.makeText(getApplicationContext(), senderName + " was killed.", Toast.LENGTH_LONG).show();
+            checkGameOver();
 
         }
         else if(buf[0] == 'D'){             //receiving message that kill is declined
