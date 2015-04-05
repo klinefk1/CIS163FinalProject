@@ -37,6 +37,17 @@
         android:textColor="#ffff0000"
         android:visibility="gone"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Select a Player to Kill"
+        android:id="@+id/selectkill"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/stats"
+        android:textColor="#ffff0000"
+        android:textSize="40dp" />
+
     <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -58,7 +69,7 @@
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@id/stats"
+        android:layout_below="@id/selectkill"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:background="#ff000000"
@@ -73,17 +84,6 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Select a Player to Kill"
-            android:id="@+id/selectkill"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:textColor="#ffff0000"
-            android:textSize="40dp" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/playerToKill"

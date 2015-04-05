@@ -2,6 +2,7 @@ package edu.gvsu.cis.klinefek.finalproject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -15,6 +16,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -79,6 +81,7 @@ public class MapsActivity extends FragmentActivity implements
     private boolean confirmedKill = false;
     private TextView kill;
     private TextView returnToMap;
+    private TextView selectkill;
     private ArrayList<LatLng> killLocations;
     private ArrayList<String> killInfo;
     private ArrayList<String> killTitle;
@@ -188,45 +191,15 @@ public class MapsActivity extends FragmentActivity implements
         players = new ArrayList<Participant>();
         mapDisplay = (FrameLayout) findViewById(R.id.mapfrag);
         killDisplay = (FrameLayout) findViewById(R.id.killfrag);
-
-        //sets adapter when kill is clicked
-        selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
-        selectPlayerManager = new LinearLayoutManager(this);
-        selectPlayer.setLayoutManager(selectPlayerManager);
-        selectPlayerAdapter = new selectKillAdapter(players, new selectKillAdapter.SelectorListener() {
-            @Override
-            public void onWordSelected(String w) {
-
-                Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
-                        " is being sent for confirmation.", Toast.LENGTH_LONG).show();
-                //need to make it send out a message to killed player for confirmation
-                Participant playerKilled = null;
-                for (Participant p: players){
-                    if (p.getParticipantId().equals(mMyId)){
-                        playerKilled = p;
-                        break;
-                    }
-                }
+        selectkill = (TextView) findViewById(R.id.selectkill);
 
 
-                if (playerKilled != null) {
-                    mMsgBuf[0] = 'K';
-                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
-                            mRoomId, playerKilled.getParticipantId());
-                }
-                else
-                    Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        selectPlayer.setAdapter(selectPlayerAdapter);
-        selectPlayerAdapter.notifyDataSetChanged();
         numberOfKills = 0;
 
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
-                gameResults = savedInstanceState.getIntegerArrayList("r'esults");
+                gameResults = savedInstanceState.getIntegerArrayList("results");
                 numberOfKills = savedInstanceState.getInt("numberOfKills");
                 killLocations = savedInstanceState.getParcelableArrayList("points");
                 killInfo = savedInstanceState.getStringArrayList("info");
@@ -246,11 +219,44 @@ public class MapsActivity extends FragmentActivity implements
         kill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //sets adapter when kill is clicked
                 //switch from map to recyclerView
+                selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
+                selectPlayerManager = new LinearLayoutManager(getApplicationContext());
+                selectPlayer.setLayoutManager(selectPlayerManager);
+                selectPlayerAdapter = new selectKillAdapter(players, new selectKillAdapter.SelectorListener() {
+                    @Override
+                    public void onWordSelected(String w) {
+
+                        Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
+                                " is being sent for confirmation.", Toast.LENGTH_LONG).show();
+                        //need to make it send out a message to killed player for confirmation
+                        Participant playerKilled = null;
+                        for (Participant p: players){
+                            if (p.getParticipantId().equals(mMyId)){
+                                playerKilled = p;
+                                break;
+                            }
+                        }
+
+
+                        if (playerKilled != null) {
+                            mMsgBuf[0] = 'K';
+                            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                    mRoomId, playerKilled.getParticipantId());
+                        }
+                        else
+                            Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
+                    }
+                });
+                selectPlayer.setAdapter(selectPlayerAdapter);
+                selectPlayerAdapter.notifyDataSetChanged();
+
                 mapDisplay.setVisibility(View.GONE);
                 kill.setVisibility(View.GONE);
                 killDisplay.setVisibility(View.VISIBLE);
                 returnToMap.setVisibility(View.VISIBLE);
+                selectkill.setVisibility(View.VISIBLE);
 
                 //need to remember to put a popup in for back button
                 //to let players know that it will make them leave the game
@@ -264,8 +270,10 @@ public class MapsActivity extends FragmentActivity implements
                 //switch from map to recyclerView
                 killDisplay.setVisibility(View.GONE);
                 returnToMap.setVisibility(View.GONE);
+                selectkill.setVisibility(View.GONE);
                 mapDisplay.setVisibility(View.VISIBLE);
                 kill.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -403,6 +411,7 @@ public class MapsActivity extends FragmentActivity implements
         keepScreenOn();
         resetGameVars();
         Games.RealTimeMultiplayer.create(mGoogleApiClient, rtmConfigBuilder.build());
+
         Log.d(TAG, "Room created, waiting for it to be ready...");
     }
 
@@ -472,6 +481,7 @@ public class MapsActivity extends FragmentActivity implements
         else if(keyCode == KeyEvent.KEYCODE_BACK && killDisplay.getVisibility() == View.VISIBLE){
             killDisplay.setVisibility(View.GONE);
             returnToMap.setVisibility(View.GONE);
+            selectkill.setVisibility(View.GONE);
             mapDisplay.setVisibility(View.VISIBLE);
             kill.setVisibility(View.VISIBLE);
             return false;
@@ -994,6 +1004,9 @@ public class MapsActivity extends FragmentActivity implements
                 }
             }
             Toast.makeText(getApplicationContext(), "Game over", Toast.LENGTH_LONG).show();
+            mMsgBuf[0] = 'O';
+            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
+                   mMsgBuf, mRoomId);
         }
         else{
             int playersLeft = killInfo.size() - players.size() - 1;
@@ -1086,6 +1099,8 @@ public class MapsActivity extends FragmentActivity implements
             Toast.makeText(getApplicationContext(), senderName + " was killed.", Toast.LENGTH_LONG).show();
             checkGameOver();
 
+
+
         }
         else if(buf[0] == 'D'){             //receiving message that kill is declined
             Toast.makeText(getApplicationContext(), "The player did not confirm the kill.",
@@ -1113,6 +1128,10 @@ public class MapsActivity extends FragmentActivity implements
                     .title(killedName)
                     .snippet(otherinfo)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
+
+        }
+        else if(buf[0] == 'O'){
+            Toast.makeText(getApplicationContext(), "You just lost the game.", Toast.LENGTH_LONG).show();
 
         }
     }

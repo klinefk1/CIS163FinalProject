@@ -1,8 +1,12 @@
 package edu.gvsu.cis.klinefek.finalproject;
 
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.net.http.AndroidHttpClient;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +17,12 @@ import com.google.android.gms.games.Player;
 import com.google.android.gms.games.multiplayer.Participant;
 
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -28,18 +38,17 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
         players = gamePlayers;
     }
 
-    private class EpisodeHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    private class PlayerHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         public TextView name;
         public ImageView picture;
 
 
-        public EpisodeHolder(final View itemView) {
+        public PlayerHolder(final View itemView) {
             super(itemView);
 
             name = (TextView) itemView.findViewById(R.id.name);
             picture = (ImageView) itemView.findViewById(R.id.playerImg);
-
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
@@ -61,13 +70,13 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.selectgroupcell,
                 viewGroup, false);
-        EpisodeHolder holder = new EpisodeHolder(v);
+        PlayerHolder holder = new PlayerHolder(v);
         return holder;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
-        EpisodeHolder tmp = (EpisodeHolder) viewHolder;
+        PlayerHolder tmp = (PlayerHolder) viewHolder;
 
         tmp.name.setText(players.get(i).getDisplayName());
 
@@ -82,6 +91,7 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     }
 
+
     @Override
     public int getItemCount() {
         return players.size();
@@ -89,5 +99,6 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public interface SelectorListener{
         void onWordSelected(String w);
+
     }
 }
