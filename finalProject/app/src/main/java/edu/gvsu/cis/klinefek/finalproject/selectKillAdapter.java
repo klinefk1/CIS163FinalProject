@@ -70,15 +70,15 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
         PlayerHolder tmp = (PlayerHolder) viewHolder;
 
         tmp.name.setText(players.get(i).getDisplayName());
-
-        if(players.get(i).getIconImageUri() != null) {
-            Uri pic = players.get(i).getIconImageUri();
-            tmp.picture.setImageURI(pic);
-        }
-        else{
+//TODO
+//        if(players.get(i).getIconImageUri() != null) {
+//            Uri pic = players.get(i).getIconImageUri();
+//            tmp.picture.setImageURI(pic);
+//        }
+//        else{
             //default image if the player does not have one
             tmp.picture.setImageResource(R.drawable.ic_launcher);
-        }
+//        }
 
     }
 

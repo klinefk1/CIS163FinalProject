@@ -219,25 +219,25 @@ public class MapsActivity extends FragmentActivity implements
             @Override
             public void onWordSelected(String w) {
 
-                Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
-                        " is being sent for confirmation.", Toast.LENGTH_LONG).show();
-                //need to make it send out a message to killed player for confirmation
-                Participant playerKilled = null;
-                for (Participant p: players){
-                    if (p.getParticipantId().equals(mMyId)){
-                        playerKilled = p;
-                        break;
-                    }
-                }
-
-
-                if (playerKilled != null) {
-                    mMsgBuf[0] = 'K';
-                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
-                            mRoomId, playerKilled.getParticipantId());
-                }
-                else
-                    Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
+//                        " is being sent for confirmation.", Toast.LENGTH_LONG).show();
+//                //need to make it send out a message to killed player for confirmation
+//                Participant playerKilled = null;
+//                for (Participant p: players){
+//                    if (p.getDisplayName().equals(w)){
+//                        playerKilled = p;
+//                        break;
+//                    }
+//                }
+//
+//
+//                if (playerKilled != null) {
+//                    mMsgBuf[0] = 'K';
+//                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+//                            mRoomId, playerKilled.getParticipantId());
+//                }
+//                else
+//                    Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
             }
         });
         selectPlayer.setAdapter(selectPlayerAdapter);
@@ -259,7 +259,7 @@ public class MapsActivity extends FragmentActivity implements
                         //need to make it send out a message to killed player for confirmation
                         Participant playerKilled = null;
                         for (Participant p: players){
-                            if (p.getParticipantId().equals(mMyId)){
+                            if (p.getDisplayName().equals(w)){
                                 playerKilled = p;
                                 break;
                             }
@@ -1294,6 +1294,7 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onRealTimeMessageSent(int i, int i2, String s) {
+        Log.d("Message Sent", "sent");
 
     }
 }
