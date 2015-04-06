@@ -56,6 +56,7 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
                     listener.onWordSelected(t.getText().toString());
                 }
             });
+
         }
 
         @Override
@@ -81,8 +82,8 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
         tmp.name.setText(players.get(i).getDisplayName());
 
         if(players.get(i).getIconImageUri() != null) {
-            Uri picture = players.get(i).getIconImageUri();
-            tmp.picture.setImageURI(picture);
+            Uri pic = players.get(i).getIconImageUri();
+            tmp.picture.setImageURI(pic);
         }
         else{
             //default image if the player does not have one

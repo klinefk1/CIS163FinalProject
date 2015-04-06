@@ -478,6 +478,12 @@ public class MapsActivity extends FragmentActivity implements
             leaveRoom();
             return true;
         }
+        else if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_sign_in ||
+                R.id.screen_wait == mCurScreen || mCurScreen == R.id.invitation_popup) {
+            switchToScreen(R.id.screen_main);
+
+            return false;
+        }
         else if(keyCode == KeyEvent.KEYCODE_BACK && killDisplay.getVisibility() == View.VISIBLE){
             killDisplay.setVisibility(View.GONE);
             returnToMap.setVisibility(View.GONE);
@@ -487,30 +493,39 @@ public class MapsActivity extends FragmentActivity implements
             return false;
         }
         else if (keyCode == KeyEvent.KEYCODE_BACK) {
-            final boolean[] leave = new boolean[1];
             new AlertDialog.Builder(this)
                     .setTitle("Leaving game")
                     .setMessage("Pressing back and returning to the " +
-                        " home screen will cause you to forfeit the match. Would " +
-                        "you like to continue?")
+                        " previous screen will cause you to forfeit the match. Would " +
+                        "you like to continue? (You can press your home key to accompish " +
+                        "other tasks.")
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // leave the match
-                            leaveRoom();
-                            leave[0] = true;
+                            checkResponse(true);
                         }
                     })
                     .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // do nothing
-                            leave[0] = false;
                         }
                     })
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
-            return leave[0];
+
+            return false;
         }
         return super.onKeyDown(keyCode, e);
+    }
+
+    private void checkResponse(boolean leave){
+        if(leave){
+            leaveRoom();
+            Intent intent = new Intent(MapsActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        }
     }
 
 
