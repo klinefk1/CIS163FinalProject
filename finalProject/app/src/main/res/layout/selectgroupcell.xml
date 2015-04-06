@@ -30,7 +30,8 @@
                 android:textStyle="bold"
                 android:textColor="#ffff0000"
                 android:paddingLeft="6dp"
-                android:gravity="center_vertical|center_horizontal" />
+                android:gravity="center_vertical|center_horizontal"
+                android:textSize="30dp" />
 
 
 

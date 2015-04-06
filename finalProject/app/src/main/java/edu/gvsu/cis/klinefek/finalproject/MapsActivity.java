@@ -265,7 +265,6 @@ public class MapsActivity extends FragmentActivity implements
                             }
                         }
 
-
                         if (playerKilled != null) {
                             mMsgBuf[0] = 'K';
                             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
