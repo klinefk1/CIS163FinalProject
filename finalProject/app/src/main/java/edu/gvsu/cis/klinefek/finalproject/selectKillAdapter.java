@@ -1,28 +1,17 @@
 package edu.gvsu.cis.klinefek.finalproject;
 
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+
 import android.net.Uri;
-import android.net.http.AndroidHttpClient;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.games.Player;
 import com.google.android.gms.games.multiplayer.Participant;
 
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-
-import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -31,11 +20,12 @@ import java.util.ArrayList;
 public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private ArrayList<Participant> players;
-    private SelectorListener listener;
+    private SelectorListener killListener;
 
 
     public selectKillAdapter(ArrayList<Participant> gamePlayers, SelectorListener listener){
         players = gamePlayers;
+        killListener = listener;
     }
 
     private class PlayerHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -53,7 +43,7 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
             itemView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     TextView t = (TextView) itemView.findViewById(R.id.name);
-                    listener.onWordSelected(t.getText().toString());
+                    killListener.onWordSelected(t.getText().toString());
                 }
             });
 
@@ -62,7 +52,7 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
         @Override
         public void onClick(View v) {
 
-            listener.onWordSelected(name.getText().toString());
+            killListener.onWordSelected(name.getText().toString());
 
         }
     }

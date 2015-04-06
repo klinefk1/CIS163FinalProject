@@ -2,7 +2,6 @@ package edu.gvsu.cis.klinefek.finalproject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -16,7 +15,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -131,9 +129,6 @@ public class MapsActivity extends FragmentActivity implements
     // not playing.
     String mRoomId = null;
 
-    // Are we playing in multiplayer mode?
-    boolean mMultiplayer = false;
-
     // The participants in the currently active game
     ArrayList<Participant> players = null;
 
@@ -200,6 +195,7 @@ public class MapsActivity extends FragmentActivity implements
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
                 gameResults = savedInstanceState.getIntegerArrayList("results");
+                mCurScreen = savedInstanceState.getInt("screen");
                 numberOfKills = savedInstanceState.getInt("numberOfKills");
                 killLocations = savedInstanceState.getParcelableArrayList("points");
                 killInfo = savedInstanceState.getStringArrayList("info");
@@ -216,6 +212,36 @@ public class MapsActivity extends FragmentActivity implements
             }
         }
 
+        selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
+        selectPlayerManager = new LinearLayoutManager(getApplicationContext());
+        selectPlayer.setLayoutManager(selectPlayerManager);
+        selectPlayerAdapter = new selectKillAdapter(players, new selectKillAdapter.SelectorListener() {
+            @Override
+            public void onWordSelected(String w) {
+
+                Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
+                        " is being sent for confirmation.", Toast.LENGTH_LONG).show();
+                //need to make it send out a message to killed player for confirmation
+                Participant playerKilled = null;
+                for (Participant p: players){
+                    if (p.getParticipantId().equals(mMyId)){
+                        playerKilled = p;
+                        break;
+                    }
+                }
+
+
+                if (playerKilled != null) {
+                    mMsgBuf[0] = 'K';
+                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                            mRoomId, playerKilled.getParticipantId());
+                }
+                else
+                    Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
+            }
+        });
+        selectPlayer.setAdapter(selectPlayerAdapter);
+        selectPlayerAdapter.notifyDataSetChanged();
         kill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -278,13 +304,15 @@ public class MapsActivity extends FragmentActivity implements
         });
 
         // Create the Google Api Client with access to Plus and Games
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                .build();
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
+                    .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+                    .build();
+        }
 
         // set up a click listener for everything we care about
         for (int id : CLICKABLES) {
@@ -334,6 +362,7 @@ public class MapsActivity extends FragmentActivity implements
         outState.putStringArrayList("title", killTitle);
         outState.putIntegerArrayList("results", gameResults);
         outState.putInt("numberOfKills", numberOfKills);
+        outState.putInt("screen", mCurScreen);
     }
 
 
@@ -380,8 +409,6 @@ public class MapsActivity extends FragmentActivity implements
                 }
                 break;
         }
-
-
     }
 
     // Handle the result of the "Select players UI" we launched when the user clicked the
@@ -398,7 +425,6 @@ public class MapsActivity extends FragmentActivity implements
         // get the invitee list
         final ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
         Log.d(TAG, "Invitee count: " + invitees.size());
-
 
 
         // create the room
@@ -431,7 +457,6 @@ public class MapsActivity extends FragmentActivity implements
         acceptInviteToRoom(inv.getInvitationId());
     }
 
-
     // Accept the given invitation.
     void acceptInviteToRoom(String invId) {
         // accept the invitation
@@ -450,8 +475,6 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onStop() {
         Log.d(TAG, "**** got onStop");
-
-
 
         // stop trying to keep the screen on
         stopKeepingScreenOn();
@@ -527,8 +550,6 @@ public class MapsActivity extends FragmentActivity implements
             finish();
         }
     }
-
-
 
     // Leave the room.
     void leaveRoom() {
@@ -1177,12 +1198,9 @@ public class MapsActivity extends FragmentActivity implements
         if (mIncomingInvitationId == null) {
             // no invitation, so no popup
             showInvPopup = false;
-        } else if (mMultiplayer) {
+        } else{
             // if in multiplayer, only show invitation on main screen
-            showInvPopup = (mCurScreen == R.layout.mapdisplay);
-        } else {
-            // single-player: show on main screen and gameplay screen
-            showInvPopup = (mCurScreen == R.layout.mapdisplay || mCurScreen == R.id.screen_game);
+            showInvPopup = (mCurScreen == R.id.screen_main);
         }
         findViewById(R.id.invitation_popup).setVisibility(showInvPopup ? View.VISIBLE : View.GONE);
     }
