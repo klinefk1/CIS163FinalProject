@@ -191,6 +191,8 @@ public class MapsActivity extends FragmentActivity implements
 
         numberOfKills = 0;
 
+        //TODO
+        //remove this in lieu of freezing in portrait mode
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
@@ -218,30 +220,20 @@ public class MapsActivity extends FragmentActivity implements
         selectPlayerAdapter = new selectKillAdapter(players, new selectKillAdapter.SelectorListener() {
             @Override
             public void onWordSelected(String w) {
-
-//                Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
-//                        " is being sent for confirmation.", Toast.LENGTH_LONG).show();
-//                //need to make it send out a message to killed player for confirmation
-//                Participant playerKilled = null;
-//                for (Participant p: players){
-//                    if (p.getDisplayName().equals(w)){
-//                        playerKilled = p;
-//                        break;
-//                    }
-//                }
-//
-//
-//                if (playerKilled != null) {
-//                    mMsgBuf[0] = 'K';
-//                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
-//                            mRoomId, playerKilled.getParticipantId());
-//                }
-//                else
-//                    Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
+                //this is just so that everything is declared to prevent an error
+                //when back is pushed and recyclerView has not been instantiated by
+                //the onClickListener
             }
         });
         selectPlayer.setAdapter(selectPlayerAdapter);
         selectPlayerAdapter.notifyDataSetChanged();
+
+        //TODO
+        //make sure player who is killed does not show up on future lists
+        //and make sure he/she can't kill anymore (marked as lost game)
+        //implement game mode differences
+
+        //used to initiate kill player
         kill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -256,7 +248,8 @@ public class MapsActivity extends FragmentActivity implements
 
                         Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
                                 " is being sent for confirmation.", Toast.LENGTH_LONG).show();
-                        //need to make it send out a message to killed player for confirmation
+
+                        //finds player who was killed in the arraylist
                         Participant playerKilled = null;
                         for (Participant p: players){
                             if (p.getDisplayName().equals(w)){
@@ -265,6 +258,7 @@ public class MapsActivity extends FragmentActivity implements
                             }
                         }
 
+                        //sends message to that player to either accept or deny the kill
                         if (playerKilled != null) {
                             mMsgBuf[0] = 'K';
                             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
@@ -282,10 +276,6 @@ public class MapsActivity extends FragmentActivity implements
                 killDisplay.setVisibility(View.VISIBLE);
                 returnToMap.setVisibility(View.VISIBLE);
                 selectkill.setVisibility(View.VISIBLE);
-
-                //need to remember to put a popup in for back button
-                //to let players know that it will make them leave the game
-                //which asks for confirmation
             }
         });
 
@@ -298,7 +288,6 @@ public class MapsActivity extends FragmentActivity implements
                 selectkill.setVisibility(View.GONE);
                 mapDisplay.setVisibility(View.VISIBLE);
                 kill.setVisibility(View.VISIBLE);
-
             }
         });
 
@@ -313,15 +302,12 @@ public class MapsActivity extends FragmentActivity implements
                     .build();
         }
 
-        // set up a click listener for everything we care about
+        // set up a click listener for everything else
         for (int id : CLICKABLES) {
             findViewById(id).setOnClickListener(this);
         }
 
-
         mGoogleApiClient.connect();
-        //eventually may have to include an if to account for orientation change
-
     }
 
     /**
@@ -334,9 +320,6 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     protected void onStart() {
         switchToScreen(R.id.screen_wait);
-//        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-//            Log.w(TAG,
-//                    "GameHelper: client was already connected on onStart()");
         if (mGoogleApiClient == null || !mGoogleApiClient.isConnected())
         {
             Log.d(TAG,"Connecting client.");
@@ -349,6 +332,9 @@ public class MapsActivity extends FragmentActivity implements
     /**
      * Saves the resolution state.
      */
+    //TODO
+    //remove this once portrait is frozen
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -434,7 +420,6 @@ public class MapsActivity extends FragmentActivity implements
         rtmConfigBuilder.setRoomStatusUpdateListener(this);
         switchToScreen(R.id.screen_wait);
         keepScreenOn();
-        resetGameVars();
         Games.RealTimeMultiplayer.create(mGoogleApiClient, rtmConfigBuilder.build());
 
         Log.d(TAG, "Room created, waiting for it to be ready...");
@@ -466,11 +451,11 @@ public class MapsActivity extends FragmentActivity implements
                 .setRoomStatusUpdateListener(this);
         switchToScreen(R.id.screen_wait);
         keepScreenOn();
-        resetGameVars();
         Games.RealTimeMultiplayer.join(mGoogleApiClient, roomConfigBuilder.build());
     }
 
-    // Activity is going to the background. We have to leave the current room.
+    // Activity is going to the background. We need to have player stay in room while
+    // accomplishing other tasks.  Goes to sign-in screen if becomes disconnected
     @Override
     public void onStop() {
         Log.d(TAG, "**** got onStop");
@@ -481,31 +466,26 @@ public class MapsActivity extends FragmentActivity implements
         if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()){
             switchToScreen(R.id.screen_sign_in);
         }
-//        else {
-//            switchToScreen(R.id.screen_wait);
-//        }
         super.onStop();
-
     }
 
     // Handle back key to make sure we cleanly leave a game if we are in the middle of one
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent e) {
-
-        //fix this later...right now it only returns false
-        //which I believe is an async issue
-        //(returns before dialog is complete)
-
+        //can go to title screen before game initiates
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_game) {
             leaveRoom();
             return true;
         }
+        //returns to the main screen if on a mode selector, or viewing invitations
         else if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_sign_in ||
                 R.id.screen_wait == mCurScreen || mCurScreen == R.id.invitation_popup) {
             switchToScreen(R.id.screen_main);
 
             return false;
         }
+
+        //switches from the kill screen back to the map
         else if(keyCode == KeyEvent.KEYCODE_BACK && killDisplay.getVisibility() == View.VISIBLE){
             killDisplay.setVisibility(View.GONE);
             returnToMap.setVisibility(View.GONE);
@@ -514,13 +494,16 @@ public class MapsActivity extends FragmentActivity implements
             kill.setVisibility(View.VISIBLE);
             return false;
         }
+
+        //displays warning and requires confirmation before
+        //leaving the game.
         else if (keyCode == KeyEvent.KEYCODE_BACK) {
             new AlertDialog.Builder(this)
                     .setTitle("Leaving game")
                     .setMessage("Pressing back and returning to the " +
                         " previous screen will cause you to forfeit the match. Would " +
-                        "you like to continue? (You can press your home key to accompish " +
-                        "other tasks.")
+                        "you like to continue? (You can press your home key to accomplish " +
+                        "other tasks)")
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // leave the match
@@ -557,7 +540,7 @@ public class MapsActivity extends FragmentActivity implements
         if (mRoomId != null) {
             Games.RealTimeMultiplayer.leave(mGoogleApiClient, this, mRoomId);
             mRoomId = null;
-            switchToScreen(R.id.screen_wait);
+            switchToScreen(R.id.screen_main);
         } else {
             switchToMainScreen();
         }
@@ -576,6 +559,8 @@ public class MapsActivity extends FragmentActivity implements
         startActivityForResult(i, RC_WAITING_ROOM);
     }
 
+    //TODO
+    //add an ignore option
 
     // Called when we get an invitation to play a game. We react by showing that to the user.
     @Override
@@ -746,6 +731,9 @@ public class MapsActivity extends FragmentActivity implements
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
 
+    //TODO
+    //make zoom happen on initialization, but not
+    //constantly afterward
 
     @Override
     public void onLocationChanged(Location location) {
@@ -915,16 +903,8 @@ public class MapsActivity extends FragmentActivity implements
         switchToScreen(R.layout.mapdisplay);
     }
 
-    // Reset game variables in preparation for a new game.
-    void resetGameVars() {
-        //add stuff later
-        mParticipantScore.clear();
-        mFinishedParticipants.clear();
-    }
 
-
-    //sets a marker at the location of a kill.  Should later record information about it
-    //once the add players and store info about players database is set up
+    //sets a marker at the location of a kill.
     private void setKillMarker(String killer, String killed){
         if(confirmedKill){
             LatLng geoPos = new LatLng(myMarker.getPosition().latitude, myMarker.getPosition().longitude);
@@ -988,6 +968,7 @@ public class MapsActivity extends FragmentActivity implements
         return bytes;
     }
 
+    //verify this works
     public Object latLngToObject (byte[] bytes)
     {
         Object obj = null;
@@ -1045,23 +1026,15 @@ public class MapsActivity extends FragmentActivity implements
         }
         else{
             int playersLeft = killInfo.size() - players.size() - 1;
-
             Toast.makeText(getApplicationContext(), playersLeft + " players left  to kill.", Toast.LENGTH_LONG).show();
         }
     }
-
 
     /*
      * COMMUNICATIONS SECTION. Methods that implement the game's network
      * protocol.
      */
 
-    // Score of other participants. We update this as we receive their scores
-    // from the network.
-    Map<String, Integer> mParticipantScore = new HashMap<String, Integer>();
-
-    // Participants who sent us their final score.
-    Set<String> mFinishedParticipants = new HashSet<String>();
 
     // Called when we receive a real-time message from the network.
     // Messages in our game are made up of 2 bytes: the first one is 'F' or 'U'
@@ -1125,17 +1098,16 @@ public class MapsActivity extends FragmentActivity implements
             }
             setKillMarker(myName, senderName);
 
+            //TODO
+            //verify that this works
             for(int p = 0; p < players.size(); p++){
-                if(mMyId == players.get(p).getParticipantId()){
+                if(sender == players.get(p).getParticipantId()){
                     gameResults.set(p, 2); //indicates lost game
                 }
             }
 
             Toast.makeText(getApplicationContext(), senderName + " was killed.", Toast.LENGTH_LONG).show();
             checkGameOver();
-
-
-
         }
         else if(buf[0] == 'D'){             //receiving message that kill is declined
             Toast.makeText(getApplicationContext(), "The player did not confirm the kill.",
@@ -1163,11 +1135,10 @@ public class MapsActivity extends FragmentActivity implements
                     .title(killedName)
                     .snippet(otherinfo)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
-
+            checkGameOver();
         }
         else if(buf[0] == 'O'){
             Toast.makeText(getApplicationContext(), "You just lost the game.", Toast.LENGTH_LONG).show();
-
         }
     }
 
@@ -1237,7 +1208,8 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onClick(View v) {
         Intent intent;
-
+        //TODO
+        //implement the game modes in the message
         switch (v.getId()) {
             case R.id.freeForAll:
                 // show list of invitable players
