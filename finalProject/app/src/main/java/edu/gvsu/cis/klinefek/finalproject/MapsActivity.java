@@ -94,8 +94,6 @@ public class MapsActivity extends FragmentActivity implements
     private RecyclerView.Adapter selectPlayerAdapter;
     private RecyclerView.LayoutManager selectPlayerManager;
     private int numberOfKills;
-    private double killedLat;
-    private double killedLon;
     private ArrayList<Integer> gameResults; //0 for in progress, 1 for win, 2 for lose
                                         //the index number is the same index number
                                         //of the cooresponding participant
@@ -919,7 +917,6 @@ public class MapsActivity extends FragmentActivity implements
                 message[i+9] = longitude[i];
             }
             //killed ID
-            //TODO pass kill id as a param
             for(int i = 0; i < killedId.length(); i++){
                 message[i+17] = killedIdAr[i];
             }
@@ -1025,6 +1022,13 @@ public class MapsActivity extends FragmentActivity implements
                     "Is this true?")
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
+
+                            for(int p = 0; p < players.size(); p++){
+                                if(mMyId.equals(players.get(p).getParticipantId())){
+                                    gameResults.set(p, 2); //indicates lost game
+                                }
+                            }
+
                             mMsgBuf[0] = 'A';
                             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
                                     mRoomId, sendTo);
@@ -1061,9 +1065,8 @@ public class MapsActivity extends FragmentActivity implements
             }
             setKillMarker(myName, senderName, sender);
 
-            //TODO verify that this works
             for(int p = 0; p < players.size(); p++){
-                if(sender == players.get(p).getParticipantId()){
+                if(sender.equals(players.get(p).getParticipantId())){
                     gameResults.set(p, 2); //indicates lost game
                 }
             }
@@ -1072,45 +1075,6 @@ public class MapsActivity extends FragmentActivity implements
             checkGameOver();
         }
 
-//        //for setting lattitude
-//        else if(buf[0] == '1'){
-//            killedLat = toDouble(Arrays.copyOfRange(buf, 1, buf.length);
-//            if (null != killedLon){
-//                //set kill marker
-//                //return both to null
-//
-//                LatLng geoPos = new LatLng(killedLat, killedLon);
-//                killLocations.add(geoPos);
-//                //this is used to store each kill location so that they can be
-//                //reset when orientation changes and updated for other players
-//
-//                //finds info to use when setting marker message box
-//                String killedName;
-//                String otherinfo;
-//
-//                otherinfo = setMarkerInfo();
-//                //toDo make second parm person who was killed
-//                killedName = setMarkerInfo2(sender, sender);
-//
-//                //adds marker to the map
-//                mMap.addMarker(new MarkerOptions()
-//                        .position(geoPos)
-//                        .title(killedName)
-//                        .snippet(otherinfo)
-//                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
-//            }
-//        }
-//
-//        //for setting longitude
-//        else if(buf[0] == '2'){
-//            killedLon = toDouble(Arrays.copyOfRange(buf, 1, buf.length);
-//            if (killedLat != null){
-//                //set kill marker
-//                //both to null
-//                killedLat = null;
-//                killedLon = null;
-//            }
-//        }
 
         else if(buf[0] == 'D'){             //receiving message that kill is declined
             Toast.makeText(getApplicationContext(), "The player did not confirm the kill.",
