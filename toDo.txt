@@ -1,7 +1,5 @@
 Things that need done for the final project:
 
-	-fix RestoreInstanceState and all the put stuff so that variables do not reset on orientation change
-		-Mike lock in portrait
 
 	-store data after game completes - I believe we had a lab about something similar to this 
 		-things could be updated (saved on system)
@@ -26,10 +24,6 @@ Things that need done for the final project:
 	-add kills/stats screen accessable from main screen
 		-use stored data talked about above
 		-Mike
-
-	-change "stats" on map/kills screen to brief instuctions button (better name for this)
-		-shows pop-up with instructions that Austin typed for main screen
-		-Katherine
 
 	-figure out what to do in the final screen (probably display 'you win' or something and button to take player back to first screen)
 		-Mike

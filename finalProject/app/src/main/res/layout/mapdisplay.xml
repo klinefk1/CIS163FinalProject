@@ -7,8 +7,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Stats"
-        android:id="@+id/stats"
+        android:text="Help"
+        android:id="@+id/inGameInstructions"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -20,7 +20,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Kill"
         android:id="@+id/killbutton"
-        android:layout_alignBottom="@+id/stats"
+        android:layout_alignBottom="@+id/inGameInstructions"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:textColor="#ffff0000" />
@@ -31,7 +31,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Return to Map"
         android:id="@+id/returnToMap"
-        android:layout_alignBottom="@+id/stats"
+        android:layout_alignBottom="@+id/inGameInstructions"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:textColor="#ffff0000"
@@ -44,14 +44,14 @@
         android:text="Select a Player to Kill"
         android:id="@+id/selectkill"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/stats"
+        android:layout_below="@+id/inGameInstructions"
         android:textColor="#ffff0000"
         android:textSize="40dp" />
 
     <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/stats"
+        android:layout_below="@+id/inGameInstructions"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/mapfrag">
@@ -123,9 +123,7 @@
             <TextView style="@style/GameTitle" />
             <TextView style="@style/GameBlurb" />
 
-            <Button android:id="@+id/button_single_player"
-                style="@style/MainScreenButton"
-                android:text="@string/single_player" />
+
             <com.google.android.gms.common.SignInButton android:id="@+id/button_sign_in"
                 style="@style/SignInButton" />
         </LinearLayout>

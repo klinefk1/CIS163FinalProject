@@ -2,6 +2,7 @@ package edu.gvsu.cis.klinefek.finalproject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -81,6 +82,7 @@ public class MapsActivity extends FragmentActivity implements
     private TextView kill;
     private TextView returnToMap;
     private TextView selectkill;
+    private TextView instructions;
     private ArrayList<LatLng> killLocations;
     private ArrayList<String> killInfo;
     private ArrayList<String> killTitle;
@@ -188,6 +190,7 @@ public class MapsActivity extends FragmentActivity implements
         mapDisplay = (FrameLayout) findViewById(R.id.mapfrag);
         killDisplay = (FrameLayout) findViewById(R.id.killfrag);
         selectkill = (TextView) findViewById(R.id.selectkill);
+        instructions = (TextView) findViewById(R.id.inGameInstructions);
 
 
         numberOfKills = 0;
@@ -206,9 +209,36 @@ public class MapsActivity extends FragmentActivity implements
         selectPlayer.setAdapter(selectPlayerAdapter);
         selectPlayerAdapter.notifyDataSetChanged();
 
-        //TODO make sure player who is killed does not show up on future lists
-        //and make sure he/she can't kill anymore (marked as lost game)
-        //implement game mode differences
+
+        instructions.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                String message = "Error: Game mode not selected.";
+                if (gameMode == 1){
+                    //set message to Free-for-all
+                    message = getString(R.string.mode1instructions);
+                }
+                else if(gameMode == 2) {
+                    //set message to bounty hunter
+                    message = getString(R.string.mode2instructions);
+                    //TODO set brief instruction strings
+
+                }
+                new AlertDialog.Builder(MapsActivity.this) //
+                        .setTitle("Instructions")
+                        .setMessage(message)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+
+        });
+
+
 
         //used to initiate kill player
         kill.setOnClickListener(new View.OnClickListener() {
@@ -303,6 +333,7 @@ public class MapsActivity extends FragmentActivity implements
 
         mGoogleApiClient.connect();
     }
+
 
     /**
      * Called when the Activity is made visible.
@@ -533,6 +564,7 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     //TODO add an ignore option
+    //TODO Pass game mode to person accepting invite
 
     // Called when we get an invitation to play a game. We react by showing that to the user.
     @Override
@@ -1155,6 +1187,7 @@ public class MapsActivity extends FragmentActivity implements
      */
 
 
+    //TODO make sure these work logically
 
     // This array lists all the individual screens our game has.
     final static int[] SCREENS = {
