@@ -52,6 +52,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -93,6 +94,8 @@ public class MapsActivity extends FragmentActivity implements
     private RecyclerView.Adapter selectPlayerAdapter;
     private RecyclerView.LayoutManager selectPlayerManager;
     private int numberOfKills;
+    private double killedLat;
+    private double killedLon;
     private ArrayList<Integer> gameResults; //0 for in progress, 1 for win, 2 for lose
                                         //the index number is the same index number
                                         //of the cooresponding participant
@@ -191,28 +194,6 @@ public class MapsActivity extends FragmentActivity implements
 
         numberOfKills = 0;
 
-        //TODO remove this in lieu of freezing in portrait mode
-        // Restoring the markers on configuration changes
-        if(savedInstanceState!=null){
-            if(savedInstanceState.containsKey("points")){
-                gameResults = savedInstanceState.getIntegerArrayList("results");
-                mCurScreen = savedInstanceState.getInt("screen");
-                numberOfKills = savedInstanceState.getInt("numberOfKills");
-                killLocations = savedInstanceState.getParcelableArrayList("points");
-                killInfo = savedInstanceState.getStringArrayList("info");
-                killTitle = savedInstanceState.getStringArrayList("title");
-                if(killLocations!=null){
-                    for(int i=0;i<killLocations.size();i++){
-                        mMap.addMarker(new MarkerOptions()
-                                .position(killLocations.get(i))
-                                .title(killTitle.get(i))
-                                .snippet(killInfo.get(i))
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
-                    }
-                }
-            }
-        }
-
         selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
         selectPlayerManager = new LinearLayoutManager(getApplicationContext());
         selectPlayer.setLayoutManager(selectPlayerManager);
@@ -253,17 +234,21 @@ public class MapsActivity extends FragmentActivity implements
                         }
 
                         if(gameResults.get(myIndex) == 0) {
-                            Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
-                                    " is being sent for confirmation.", Toast.LENGTH_LONG).show();
 
                             //finds player who was killed in the arraylist
                             Participant playerKilled = null;
                             for (Participant p : players) {
-                                if (p.getDisplayName().equals(w)) {
+                                if (p.getParticipantId().equals(w)) {
                                     playerKilled = p;
                                     break;
                                 }
                             }
+                            Toast.makeText(getApplicationContext(), "You selected " + playerKilled.getDisplayName()
+                                    + ".  A message" +
+                                    " is being sent for confirmation.", Toast.LENGTH_LONG).show();
+
+
+
 
                             //sends message to that player to either accept or deny the kill
                             if (playerKilled != null) {
@@ -271,7 +256,7 @@ public class MapsActivity extends FragmentActivity implements
                                 Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
                                         mRoomId, playerKilled.getParticipantId());
                             } else
-                                Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), playerKilled.getDisplayName() + " is not a valid player.", Toast.LENGTH_LONG).show();
                         }
                         else{
                             Toast.makeText(getApplicationContext(), "You are dead.  You can't " +
@@ -338,26 +323,6 @@ public class MapsActivity extends FragmentActivity implements
         }
         super.onStart();
 
-    }
-
-    /**
-     * Saves the resolution state.
-     */
-    //TODO remove this once portrait is frozen
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(KEY_IN_RESOLUTION, mIsInResolution);
-
-        // Adding the killLocations  and killInfo arraylists to Bundle so
-        //Markers can be reset
-        outState.putParcelableArrayList("points", killLocations);
-        outState.putStringArrayList("info", killInfo);
-        outState.putStringArrayList("title", killTitle);
-        outState.putIntegerArrayList("results", gameResults);
-        outState.putInt("numberOfKills", numberOfKills);
-        outState.putInt("screen", mCurScreen);
     }
 
 
@@ -910,7 +875,7 @@ public class MapsActivity extends FragmentActivity implements
 
 
     //sets a marker at the location of a kill.
-    private void setKillMarker(String killer, String killed){
+    private void setKillMarker(String killer, String killed, String killedId){
         if(confirmedKill){
             LatLng geoPos = new LatLng(myMarker.getPosition().latitude, myMarker.getPosition().longitude);
             killLocations.add(geoPos);
@@ -924,15 +889,14 @@ public class MapsActivity extends FragmentActivity implements
             otherinfo = setMarkerInfo();
             killedName = setMarkerInfo2(killer, killed);
 
-            byte killedIndex = 0;
-            for (int i = 0; i < players.size(); i++){
-                if (players.get(i).getDisplayName().equals(killed)){
-                    killedIndex = (byte) i;
-                    break;
-                }
-            }
 
-            byte[] loc = latLngToByteArray(geoPos);
+            double lat = geoPos.latitude;
+            double lon = geoPos.longitude;
+
+            byte[] latitude = toByteArray(lat);
+            byte[] longitude = toByteArray(lon);
+            byte[] killedIdAr = killedId.getBytes();
+
 
             //adds marker to the map
             mMap.addMarker(new MarkerOptions()
@@ -943,52 +907,37 @@ public class MapsActivity extends FragmentActivity implements
             confirmedKill = false;
 
 
-            byte[] message = new byte[2048];
+            byte[] message = new byte[200];
             message[0] = 'S';
-            message[1] = killedIndex;
-            for(int i = 0; i < loc.length; i++){
-                message[i+2] = loc[i];
+
+            //lat
+            for(int i = 0; i < 8; i++){
+                message[i+1] = latitude[i];
             }
+            //long
+            for(int i = 0; i < 8; i++){
+                message[i+9] = longitude[i];
+            }
+            //killed ID
+            //TODO pass kill id as a param
+            for(int i = 0; i < killedId.length(); i++){
+                message[i+17] = killedIdAr[i];
+            }
+
 
             Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
         }
     }
 
 
-    public byte[] latLngToByteArray (LatLng obj)
-    {
-        byte[] bytes = null;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(obj);
-            oos.flush();
-            oos.close();
-            bos.close();
-            bytes = bos.toByteArray ();
-        }
-        catch (IOException ex) {
-            //TODO: Handle the exception
-        }
+    public static byte[] toByteArray(double value) {
+        byte[] bytes = new byte[8];
+        ByteBuffer.wrap(bytes).putDouble(value);
         return bytes;
     }
 
-    //verify this works
-    public Object latLngToObject (byte[] bytes)
-    {
-        Object obj = null;
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream (Arrays.copyOfRange(bytes, 2, bytes.length));
-            ObjectInputStream ois = new ObjectInputStream (bis);
-            obj = ois.readObject();
-        }
-        catch (IOException ex) {
-            //TODO: Handle the exception
-        }
-        catch (ClassNotFoundException ex) {
-            //TODO: Handle the exception
-        }
-        return obj;
+    public static double toDouble(byte[] bytes) {
+        return ByteBuffer.wrap(bytes).getDouble();
     }
 
     private String setMarkerInfo(){
@@ -1018,16 +967,25 @@ public class MapsActivity extends FragmentActivity implements
     private void checkGameOver(){
         if(killInfo.size() == players.size() - 1){
             //game is over
+            //TODO intent to final screen
             //return intent to final screen
+            boolean win = false;
             for(int p = 0; p < players.size(); p++){
-                if(mMyId == players.get(p).getParticipantId()){
+                if(mMyId.equals(players.get(p).getParticipantId()) && gameResults.get(p) == 0){
                     gameResults.set(p, 1); //indicates won game
+                    Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
+                    //TODO increment variables saved on device with kills and win game mode
+                    mMsgBuf[0] = 'O';
+                    Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
+                            mMsgBuf, mRoomId);
+                    win = true;
                 }
+
             }
-            Toast.makeText(getApplicationContext(), "Game over", Toast.LENGTH_LONG).show();
-            mMsgBuf[0] = 'O';
-            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
-                   mMsgBuf, mRoomId);
+            if(!win){
+                Toast.makeText(getApplicationContext(), "You just lost the game.", Toast.LENGTH_LONG).show();
+                //TODO increment variables saved on device with kills and loss game mode
+            }
         }
         else{
             int playersLeft = killInfo.size() - players.size() - 1;
@@ -1101,7 +1059,7 @@ public class MapsActivity extends FragmentActivity implements
                     break;
                 }
             }
-            setKillMarker(myName, senderName);
+            setKillMarker(myName, senderName, sender);
 
             //TODO verify that this works
             for(int p = 0; p < players.size(); p++){
@@ -1113,13 +1071,60 @@ public class MapsActivity extends FragmentActivity implements
 
             checkGameOver();
         }
+
+//        //for setting lattitude
+//        else if(buf[0] == '1'){
+//            killedLat = toDouble(Arrays.copyOfRange(buf, 1, buf.length);
+//            if (null != killedLon){
+//                //set kill marker
+//                //return both to null
+//
+//                LatLng geoPos = new LatLng(killedLat, killedLon);
+//                killLocations.add(geoPos);
+//                //this is used to store each kill location so that they can be
+//                //reset when orientation changes and updated for other players
+//
+//                //finds info to use when setting marker message box
+//                String killedName;
+//                String otherinfo;
+//
+//                otherinfo = setMarkerInfo();
+//                //toDo make second parm person who was killed
+//                killedName = setMarkerInfo2(sender, sender);
+//
+//                //adds marker to the map
+//                mMap.addMarker(new MarkerOptions()
+//                        .position(geoPos)
+//                        .title(killedName)
+//                        .snippet(otherinfo)
+//                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
+//            }
+//        }
+//
+//        //for setting longitude
+//        else if(buf[0] == '2'){
+//            killedLon = toDouble(Arrays.copyOfRange(buf, 1, buf.length);
+//            if (killedLat != null){
+//                //set kill marker
+//                //both to null
+//                killedLat = null;
+//                killedLon = null;
+//            }
+//        }
+
         else if(buf[0] == 'D'){             //receiving message that kill is declined
             Toast.makeText(getApplicationContext(), "The player did not confirm the kill.",
                     Toast.LENGTH_LONG).show();
         }
+
+
         else if(buf[0] == 'S'){             //message received to all players set new kill marker
-            int killedPlayerIndex = buf[1];
-            LatLng geoPos = (LatLng) latLngToObject(buf);
+            //TODO find out if this is dangerous on other systems
+            double lat = toDouble(Arrays.copyOfRange(buf, 1, 9));
+            double lon = toDouble(Arrays.copyOfRange(buf, 9, 17));
+            String killedId = new String(Arrays.copyOfRange(buf, 17, 200));
+
+            LatLng geoPos = new LatLng(lat,lon);
 
             String killedName;
             String otherinfo;
@@ -1131,8 +1136,16 @@ public class MapsActivity extends FragmentActivity implements
                 }
             }
 
+            String killed = "error";
+            for(Participant p : players){
+                if(killedId.equals(p.getParticipantId())){
+                    killed = p.getDisplayName();
+                    break;
+                }
+            }
+
             otherinfo = setMarkerInfo();
-            killedName = setMarkerInfo2(senderName, players.get(killedPlayerIndex).getDisplayName());
+            killedName = setMarkerInfo2(senderName, killed);
 
             mMap.addMarker(new MarkerOptions()
                     .position(geoPos)
@@ -1142,7 +1155,14 @@ public class MapsActivity extends FragmentActivity implements
             checkGameOver();
         }
         else if(buf[0] == 'O'){
-            Toast.makeText(getApplicationContext(), "You just lost the game.", Toast.LENGTH_LONG).show();
+            for(int p = 0; p < players.size(); p++){
+                if(sender == players.get(p).getParticipantId() && gameResults.get(p) == 0){
+                    gameResults.set(p, 1); //indicates won game
+                    Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
+                    break;
+                }
+            }
+            checkGameOver();
         }
     }
 

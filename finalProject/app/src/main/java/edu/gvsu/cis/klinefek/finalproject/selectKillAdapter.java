@@ -38,6 +38,7 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         public TextView name;
         public ImageView picture;
+        public TextView playerId;
 
 
         public PlayerHolder(final View itemView) {
@@ -45,10 +46,12 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             name = (TextView) itemView.findViewById(R.id.name);
             picture = (ImageView) itemView.findViewById(R.id.playerImg);
+            playerId = (TextView) itemView.findViewById(R.id.playerId);
 
+            //returns the player ID
             itemView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    TextView t = (TextView) itemView.findViewById(R.id.name);
+                    TextView t = (TextView) itemView.findViewById(R.id.playerId);
                     killListener.onWordSelected(t.getText().toString());
                 }
             });
@@ -79,6 +82,7 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
         //and is not the user
         if(gameResults.get(i) == 0 && !players.get(i).getParticipantId().equals(myId)) {
             tmp.name.setText(players.get(i).getDisplayName());
+            tmp.playerId.setText(players.get(i).getParticipantId());
 //TODO
 //        if(players.get(i).getIconImageUri() != null) {
 //            Uri pic = players.get(i).getIconImageUri();
