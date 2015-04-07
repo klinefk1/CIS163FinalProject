@@ -20,12 +20,18 @@ import java.util.ArrayList;
 public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private ArrayList<Participant> players;
+    private ArrayList<Integer> gameResults;
     private SelectorListener killListener;
+    private String myId;
 
 
-    public selectKillAdapter(ArrayList<Participant> gamePlayers, SelectorListener listener){
+    public selectKillAdapter(ArrayList<Participant> gamePlayers, ArrayList<Integer> results,
+                             String id, SelectorListener listener){
         players = gamePlayers;
         killListener = listener;
+        gameResults = results;
+        myId = id;
+
     }
 
     private class PlayerHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -69,7 +75,10 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
         PlayerHolder tmp = (PlayerHolder) viewHolder;
 
-        tmp.name.setText(players.get(i).getDisplayName());
+        //checks that the player is not already dead
+        //and is not the user
+        if(gameResults.get(i) == 0 && !players.get(i).getParticipantId().equals(myId)) {
+            tmp.name.setText(players.get(i).getDisplayName());
 //TODO
 //        if(players.get(i).getIconImageUri() != null) {
 //            Uri pic = players.get(i).getIconImageUri();
@@ -79,6 +88,7 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
             //default image if the player does not have one
             tmp.picture.setImageResource(R.drawable.ic_launcher);
 //        }
+        }
 
     }
 

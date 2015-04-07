@@ -191,8 +191,7 @@ public class MapsActivity extends FragmentActivity implements
 
         numberOfKills = 0;
 
-        //TODO
-        //remove this in lieu of freezing in portrait mode
+        //TODO remove this in lieu of freezing in portrait mode
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
@@ -217,7 +216,7 @@ public class MapsActivity extends FragmentActivity implements
         selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
         selectPlayerManager = new LinearLayoutManager(getApplicationContext());
         selectPlayer.setLayoutManager(selectPlayerManager);
-        selectPlayerAdapter = new selectKillAdapter(players, new selectKillAdapter.SelectorListener() {
+        selectPlayerAdapter = new selectKillAdapter(players, gameResults, mMyId, new selectKillAdapter.SelectorListener() {
             @Override
             public void onWordSelected(String w) {
                 //this is just so that everything is declared to prevent an error
@@ -228,8 +227,7 @@ public class MapsActivity extends FragmentActivity implements
         selectPlayer.setAdapter(selectPlayerAdapter);
         selectPlayerAdapter.notifyDataSetChanged();
 
-        //TODO
-        //make sure player who is killed does not show up on future lists
+        //TODO make sure player who is killed does not show up on future lists
         //and make sure he/she can't kill anymore (marked as lost game)
         //implement game mode differences
 
@@ -242,30 +240,43 @@ public class MapsActivity extends FragmentActivity implements
                 selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
                 selectPlayerManager = new LinearLayoutManager(getApplicationContext());
                 selectPlayer.setLayoutManager(selectPlayerManager);
-                selectPlayerAdapter = new selectKillAdapter(players, new selectKillAdapter.SelectorListener() {
+                selectPlayerAdapter = new selectKillAdapter(players, gameResults, mMyId, new selectKillAdapter.SelectorListener() {
                     @Override
                     public void onWordSelected(String w) {
-
-                        Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
-                                " is being sent for confirmation.", Toast.LENGTH_LONG).show();
-
-                        //finds player who was killed in the arraylist
-                        Participant playerKilled = null;
-                        for (Participant p: players){
-                            if (p.getDisplayName().equals(w)){
-                                playerKilled = p;
+                        //make sure the player trying to kill is not yet dead
+                        int myIndex = 0;
+                        for(int i = 0; i < players.size(); i++){
+                            if(mMyId == players.get(i).getParticipantId()){
+                                myIndex = i;
                                 break;
                             }
                         }
 
-                        //sends message to that player to either accept or deny the kill
-                        if (playerKilled != null) {
-                            mMsgBuf[0] = 'K';
-                            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
-                                    mRoomId, playerKilled.getParticipantId());
+                        if(gameResults.get(myIndex) == 0) {
+                            Toast.makeText(getApplicationContext(), "You selected " + w + ".  A message" +
+                                    " is being sent for confirmation.", Toast.LENGTH_LONG).show();
+
+                            //finds player who was killed in the arraylist
+                            Participant playerKilled = null;
+                            for (Participant p : players) {
+                                if (p.getDisplayName().equals(w)) {
+                                    playerKilled = p;
+                                    break;
+                                }
+                            }
+
+                            //sends message to that player to either accept or deny the kill
+                            if (playerKilled != null) {
+                                mMsgBuf[0] = 'K';
+                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                        mRoomId, playerKilled.getParticipantId());
+                            } else
+                                Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
                         }
-                        else
-                            Toast.makeText(getApplicationContext(), w + " is not a valid player.", Toast.LENGTH_LONG).show();
+                        else{
+                            Toast.makeText(getApplicationContext(), "You are dead.  You can't " +
+                                    "kill people.", Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
                 selectPlayer.setAdapter(selectPlayerAdapter);
@@ -332,8 +343,7 @@ public class MapsActivity extends FragmentActivity implements
     /**
      * Saves the resolution state.
      */
-    //TODO
-    //remove this once portrait is frozen
+    //TODO remove this once portrait is frozen
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -559,8 +569,7 @@ public class MapsActivity extends FragmentActivity implements
         startActivityForResult(i, RC_WAITING_ROOM);
     }
 
-    //TODO
-    //add an ignore option
+    //TODO add an ignore option
 
     // Called when we get an invitation to play a game. We react by showing that to the user.
     @Override
@@ -602,7 +611,6 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "GoogleApiClient connected");
-        // TODO: Start making API requests.
         LocationRequest req = new LocationRequest();
         req.setInterval(10000); /*every 10 seconds*/
         req.setFastestInterval(1000); /*how fast our app can handle the notifications */
@@ -731,9 +739,7 @@ public class MapsActivity extends FragmentActivity implements
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
 
-    //TODO
-    //make zoom happen on initialization, but not
-    //constantly afterward
+    //TODO make zoom happen on initialization, but not constantly afterward
 
     @Override
     public void onLocationChanged(Location location) {
@@ -745,7 +751,6 @@ public class MapsActivity extends FragmentActivity implements
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(campos));
         if (myMarker == null) /*if we don't have a marker yet, create and add */ {
             myMarker = mMap.addMarker(new MarkerOptions().position(geoPos)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher))
                     .title("My Location"));
 
         }
@@ -938,7 +943,7 @@ public class MapsActivity extends FragmentActivity implements
             confirmedKill = false;
 
 
-            byte[] message = new byte[2 + loc.length];
+            byte[] message = new byte[2048];
             message[0] = 'S';
             message[1] = killedIndex;
             for(int i = 0; i < loc.length; i++){
@@ -1098,15 +1103,14 @@ public class MapsActivity extends FragmentActivity implements
             }
             setKillMarker(myName, senderName);
 
-            //TODO
-            //verify that this works
+            //TODO verify that this works
             for(int p = 0; p < players.size(); p++){
                 if(sender == players.get(p).getParticipantId()){
                     gameResults.set(p, 2); //indicates lost game
                 }
             }
 
-            Toast.makeText(getApplicationContext(), senderName + " was killed.", Toast.LENGTH_LONG).show();
+
             checkGameOver();
         }
         else if(buf[0] == 'D'){             //receiving message that kill is declined
@@ -1208,8 +1212,7 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onClick(View v) {
         Intent intent;
-        //TODO
-        //implement the game modes in the message
+        //TODO implement game modes
         switch (v.getId()) {
             case R.id.freeForAll:
                 // show list of invitable players
