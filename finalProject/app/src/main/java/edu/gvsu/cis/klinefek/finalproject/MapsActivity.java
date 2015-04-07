@@ -540,11 +540,15 @@ public class MapsActivity extends FragmentActivity implements
         // We got an invitation to play a game! So, store it in
         // mIncomingInvitationId
         // and show the popup on the screen.
+
+        //verifies that a game is not in progress
         mIncomingInvitationId = invitation.getInvitationId();
         ((TextView) findViewById(R.id.incoming_invitation_text)).setText(
                 invitation.getInviter().getDisplayName() + " " +
                         getString(R.string.is_inviting_you));
-        switchToScreen(mCurScreen); // This will show the invitation popup
+        if(gameMode == 0) {
+            switchToScreen(mCurScreen); // This will show the invitation popup
+        }
     }
 
 
@@ -1086,7 +1090,15 @@ public class MapsActivity extends FragmentActivity implements
             //TODO find out if this is dangerous on other systems
             double lat = toDouble(Arrays.copyOfRange(buf, 1, 9));
             double lon = toDouble(Arrays.copyOfRange(buf, 9, 17));
-            String killedId = new String(Arrays.copyOfRange(buf, 17, 200));
+
+            int strLen = 0;
+            for(int i = 0; i < buf.length; i++){
+                if(buf[i] != 0){
+                    strLen++;
+                }
+            }
+
+            String killedId = new String(Arrays.copyOfRange(buf, 17, strLen));
 
             LatLng geoPos = new LatLng(lat,lon);
 
@@ -1097,6 +1109,7 @@ public class MapsActivity extends FragmentActivity implements
             for(Participant p : players){
                 if(p.getParticipantId().equals(sender)){
                     senderName = p.getDisplayName();
+                    break;
                 }
             }
 
