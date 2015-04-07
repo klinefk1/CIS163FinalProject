@@ -27,7 +27,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,15 +48,18 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps" >
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".GooglePlayServicesActivity"
-            android:label="@string/title_activity_google_play_services" >
+            android:label="@string/title_activity_google_play_services"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".KillActivity"
-            android:label="Kill" >
+            android:label="Kill"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 
