@@ -276,7 +276,7 @@ public class MapsActivity extends FragmentActivity implements
         returnToMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //switch from map to recyclerView
+                //switch from recyclerView to map
                 killDisplay.setVisibility(View.GONE);
                 returnToMap.setVisibility(View.GONE);
                 selectkill.setVisibility(View.GONE);
@@ -1075,6 +1075,12 @@ public class MapsActivity extends FragmentActivity implements
                 }
             }
 
+            //switch from map to recyclerView
+            killDisplay.setVisibility(View.GONE);
+            returnToMap.setVisibility(View.GONE);
+            selectkill.setVisibility(View.GONE);
+            mapDisplay.setVisibility(View.VISIBLE);
+            kill.setVisibility(View.VISIBLE);
 
             checkGameOver();
         }
