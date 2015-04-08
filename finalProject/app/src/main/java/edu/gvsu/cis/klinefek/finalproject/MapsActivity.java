@@ -116,7 +116,7 @@ public class MapsActivity extends FragmentActivity implements
 
     // Set to true to automatically start the sign in flow when the Activity starts.
     // Set to false to require the user to click the button in order to sign in.
-    private boolean mAutoStartSignInFlow = true;
+    private boolean mAutoStartSignInFlow = false;
 
     // Room ID where the currently active game is taking place; null if we're
     // not playing.
@@ -648,7 +648,7 @@ public class MapsActivity extends FragmentActivity implements
      */
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.d(TAG, "onConnectionSuspended() called. Trying to reconnect.");
+        Log.d(TAG, "onConnectionFailed() called. Trying to reconnect." + result.getErrorCode());
         if (mResolvingConnectionFailure) {
             Log.d(TAG, "onConnectionFailed() ignoring connection failure; already resolving.");
             return;
