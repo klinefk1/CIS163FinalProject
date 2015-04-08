@@ -43,5 +43,6 @@
 
     <string name="app_id">793245498264</string>
     <string name="resultsstring">Results</string>
+    <string name="dismiss_popup_invite">Dismiss</string>
 
 </resources>

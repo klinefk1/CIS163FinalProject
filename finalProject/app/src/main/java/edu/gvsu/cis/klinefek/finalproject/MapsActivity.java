@@ -80,6 +80,7 @@ public class MapsActivity extends FragmentActivity implements
 
     //game logic
     private int gameMode = 0;  //0 = not selected, 1 = free-for-all, 2 = bounty hunter
+    private boolean gameStarted;
     private FrameLayout mapDisplay;
     private FrameLayout killDisplay;
     private RecyclerView selectPlayer;
@@ -170,6 +171,7 @@ public class MapsActivity extends FragmentActivity implements
         setContentView(R.layout.mapdisplay);
         setUpMapIfNeeded();
 
+        gameStarted = false;
         kill = (TextView) findViewById(R.id.killbutton);
         returnToMap = (TextView) findViewById(R.id.returnToMap);
 
@@ -461,14 +463,17 @@ public class MapsActivity extends FragmentActivity implements
         }
         super.onStop();
     }
-
+    //TODO get correct handling of back on sign in
     // Handle back key to make sure we cleanly leave a game if we are in the middle of one
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent e) {
-        //can go to title screen before game initiates
-        if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_game) {
-            leaveRoom();
-            return true;
+        if(!gameStarted && mCurScreen != R.id.screen_main){
+            switchToScreen(R.id.screen_main);
+            return false;
+        }
+        else if (!gameStarted){
+            finish();
+            return false;
         }
         //returns to the main screen if on a mode selector, or viewing invitations
         else if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_sign_in ||
@@ -477,7 +482,6 @@ public class MapsActivity extends FragmentActivity implements
 
             return false;
         }
-
         //switches from the kill screen back to the map
         else if(keyCode == KeyEvent.KEYCODE_BACK && killDisplay.getVisibility() == View.VISIBLE){
             killDisplay.setVisibility(View.GONE);
@@ -903,6 +907,7 @@ public class MapsActivity extends FragmentActivity implements
     // Start the gameplay phase of the game.
     void startGame(boolean multiplayer) {
         switchToScreen(R.layout.mapdisplay);
+        gameStarted = true;
     }
 
 
@@ -1190,6 +1195,7 @@ public class MapsActivity extends FragmentActivity implements
                     break;
                 }
             }
+            //TODO find out why losing player gets 2 result calls
             checkGameOver();
         }
     }
@@ -1204,8 +1210,8 @@ public class MapsActivity extends FragmentActivity implements
 
     // This array lists all the individual screens our game has.
     final static int[] SCREENS = {
-            R.id.screen_game, R.id.screen_main, R.id.screen_sign_in,
-            R.id.screen_wait
+            R.id.screen_main, R.id.screen_sign_in,
+            R.id.screen_wait,
     };
     int mCurScreen = -1;
 
@@ -1312,6 +1318,11 @@ public class MapsActivity extends FragmentActivity implements
                 // (the one we got through the OnInvitationReceivedListener).
                 acceptInviteToRoom(mIncomingInvitationId);
                 mIncomingInvitationId = null;
+                break;
+            case R.id.button_decline_popup_invitation:
+                //TODO hide invitation popup
+
+                findViewById(R.id.invitation_popup).setVisibility(View.GONE);
                 break;
         }
     }
