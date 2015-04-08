@@ -81,6 +81,7 @@ public class MapsActivity extends FragmentActivity implements
     //game logic
     private int gameMode = 0;  //0 = not selected, 1 = free-for-all, 2 = bounty hunter
     private boolean gameStarted;
+    private Participant theHunted;  //target player in bounty hunter
     private FrameLayout mapDisplay;
     private FrameLayout killDisplay;
     private RecyclerView selectPlayer;
@@ -212,7 +213,12 @@ public class MapsActivity extends FragmentActivity implements
                 }
                 else if(gameMode == 2) {
                     //set message to bounty hunter
-                    message = getString(R.string.mode2instructions);
+                    if(theHunted.getParticipantId().equals(mMyId)){
+                        message = "Bounty Hunter\nYou are the target!\n" + getString(R.string.mode2instructions);
+                    }
+                    else {
+                        message = "Bounty Hunter\nThe target is " + theHunted.getDisplayName() +".\n" + getString(R.string.mode2instructions);
+                    }
                     //TODO set brief instruction strings
 
                 }
@@ -522,6 +528,9 @@ public class MapsActivity extends FragmentActivity implements
 
     private void checkResponse(boolean leave){
         if(leave){
+            mMsgBuf[0] = 'V';   //player forfeits the game
+            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, mMsgBuf, mRoomId);
+
             leaveRoom();
             Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
             finalScreen.putExtra("mode", gameMode);
@@ -855,9 +864,43 @@ public class MapsActivity extends FragmentActivity implements
 
         //sets game mode for all players
         if(gameMode != 0){
-            mMsgBuf[0] = 'X';
-            mMsgBuf[1] = (byte) gameMode;
-            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, mMsgBuf, mRoomId);
+
+            byte[] message = new byte[25];
+            message[0] = 'X';
+            message[1] = (byte) gameMode;
+
+            if(gameMode == 2) {
+                int pickPlayer = (int) (Math.random() * players.size());
+                theHunted = players.get(pickPlayer);
+            }
+
+            byte[] hunted = theHunted.getParticipantId().getBytes();
+            for(int i = 0; i < hunted.length; i++){
+                message[i+2] = hunted[i];
+            }
+
+            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
+
+            String lookingFor = "The player you're looking for is " + theHunted.getDisplayName();
+            String youAreTheHunted = "Everyone is after you!";
+
+            String message2;
+            if(mMyId.equals(theHunted.getParticipantId())){
+                message2 = youAreTheHunted;
+            }
+            else{
+                message2 = lookingFor;
+            }
+
+            new AlertDialog.Builder(MapsActivity.this) //
+                    .setTitle("Bounty Hunter")
+                    .setMessage(message2)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setIcon(R.drawable.ic_launcher)
+                    .show();
         }
     }
 
@@ -908,6 +951,8 @@ public class MapsActivity extends FragmentActivity implements
     void startGame(boolean multiplayer) {
         switchToScreen(R.layout.mapdisplay);
         gameStarted = true;
+
+
     }
 
 
@@ -1001,7 +1046,13 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     private void checkGameOver(){
-        if(killInfo.size() == players.size() - 1){
+        int numRemaining =  0;
+        for(int i : gameResults){
+            if(i == 0){
+                numRemaining++;
+            }
+        }
+        if(numRemaining <= 1){
             //game is over
             //return intent to final screen
             boolean win = false;
@@ -1035,7 +1086,7 @@ public class MapsActivity extends FragmentActivity implements
             }
         }
         else{
-            int playersLeft = players.size() - 1 - killInfo.size();
+            int playersLeft = numRemaining - 1;
             Toast.makeText(getApplicationContext(), playersLeft + " players left  to kill.", Toast.LENGTH_LONG).show();
         }
     }
@@ -1094,9 +1145,72 @@ public class MapsActivity extends FragmentActivity implements
                     .setIcon(R.drawable.ic_launcher)
                     .show();
             }
+        //TODO verify this works with multiple players
+        else if(buf[0] == 'V'){
+            int playerIndex = 0;
+            String playerName = "error";
+
+            for(int i = 0; i < players.size(); i++){
+                if(sender.equals(players.get(i).getParticipantId())){
+                    playerIndex = i;
+                    playerName = players.get(i).getDisplayName();
+                }
+            }
+
+            gameResults.set(playerIndex, 2);
+
+            Toast.makeText(getApplicationContext(), playerName + " left the game.", Toast.LENGTH_LONG).show();
+            checkGameOver();
+
+        }
         else if(buf[0] == 'X'){
             //sets game mode
             gameMode = buf[1];
+
+            if(gameMode == 2) {
+                //byte array to string
+                //string to participant, set as theHunted
+
+                int strLen = 0;
+                for(int i = 0; i < buf.length; i++){
+                    if(buf[i] != 0){
+                        strLen++;
+                    }
+                }
+
+                String huntedId = new String(Arrays.copyOfRange(buf, 2, strLen));
+
+                for(Participant p : players){
+                    if(p.getParticipantId().equals(huntedId)){
+                        theHunted = p;
+                        break;
+                    }
+                }
+                //TODO change icon to display the player's image
+
+                String lookingFor = "The player you're looking for is " + theHunted.getDisplayName();
+                String youAreTheHunted = "Everyone is after you!";
+
+                String message;
+                if(mMyId.equals(theHunted.getParticipantId())){
+                    message = youAreTheHunted;
+                }
+                else{
+                    message = lookingFor;
+                }
+
+                new AlertDialog.Builder(MapsActivity.this) //
+                        .setTitle("Bounty Hunter")
+                        .setMessage(message)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .setIcon(R.drawable.ic_launcher)
+                        .show();
+            }
+
+
         }
         else if(buf[0] == 'A'){             //receiving message that kill is accepted
             String senderName = "Anonymous";
@@ -1143,7 +1257,6 @@ public class MapsActivity extends FragmentActivity implements
 
 
         else if(buf[0] == 'S'){             //message received to all players set new kill marker
-            //TODO find out if this is dangerous on other systems
             double lat = toDouble(Arrays.copyOfRange(buf, 1, 9));
             double lon = toDouble(Arrays.copyOfRange(buf, 9, 17));
 
@@ -1321,7 +1434,6 @@ public class MapsActivity extends FragmentActivity implements
                 break;
             case R.id.button_decline_popup_invitation:
                 //TODO hide invitation popup
-
                 findViewById(R.id.invitation_popup).setVisibility(View.GONE);
                 break;
         }
