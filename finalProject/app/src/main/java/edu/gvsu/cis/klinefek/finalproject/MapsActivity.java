@@ -2,6 +2,7 @@ package edu.gvsu.cis.klinefek.finalproject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -47,22 +48,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class MapsActivity extends FragmentActivity implements
@@ -81,6 +73,7 @@ public class MapsActivity extends FragmentActivity implements
     private TextView kill;
     private TextView returnToMap;
     private TextView selectkill;
+    private TextView instructions;
     private ArrayList<LatLng> killLocations;
     private ArrayList<String> killInfo;
     private ArrayList<String> killTitle;
@@ -188,6 +181,7 @@ public class MapsActivity extends FragmentActivity implements
         mapDisplay = (FrameLayout) findViewById(R.id.mapfrag);
         killDisplay = (FrameLayout) findViewById(R.id.killfrag);
         selectkill = (TextView) findViewById(R.id.selectkill);
+        instructions = (TextView) findViewById(R.id.inGameInstructions);
 
 
         numberOfKills = 0;
@@ -206,9 +200,36 @@ public class MapsActivity extends FragmentActivity implements
         selectPlayer.setAdapter(selectPlayerAdapter);
         selectPlayerAdapter.notifyDataSetChanged();
 
-        //TODO make sure player who is killed does not show up on future lists
-        //and make sure he/she can't kill anymore (marked as lost game)
-        //implement game mode differences
+
+        instructions.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                String message = "Error: Game mode not selected.";
+                if (gameMode == 1){
+                    //set message to Free-for-all
+                    message = getString(R.string.mode1instructions);
+                }
+                else if(gameMode == 2) {
+                    //set message to bounty hunter
+                    message = getString(R.string.mode2instructions);
+                    //TODO set brief instruction strings
+
+                }
+                new AlertDialog.Builder(MapsActivity.this) //
+                        .setTitle("Instructions")
+                        .setMessage(message)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+
+        });
+
+
 
         //used to initiate kill player
         kill.setOnClickListener(new View.OnClickListener() {
@@ -303,6 +324,7 @@ public class MapsActivity extends FragmentActivity implements
 
         mGoogleApiClient.connect();
     }
+
 
     /**
      * Called when the Activity is made visible.
@@ -533,6 +555,8 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     //TODO add an ignore option
+    //TODO Pass game mode to person accepting invite
+    //send reliable message in after a few seconds in onCreate
 
     // Called when we get an invitation to play a game. We react by showing that to the user.
     @Override
@@ -825,6 +849,13 @@ public class MapsActivity extends FragmentActivity implements
         Log.d(TAG, "Room ID: " + mRoomId);
         Log.d(TAG, "My ID " + mMyId);
         Log.d(TAG, "<< CONNECTED TO ROOM>>");
+
+        //sets game mode for all players
+        if(gameMode != 0){
+            mMsgBuf[0] = 'X';
+            mMsgBuf[1] = (byte) gameMode;
+            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, mMsgBuf, mRoomId);
+        }
     }
 
     @Override
@@ -989,7 +1020,7 @@ public class MapsActivity extends FragmentActivity implements
             }
         }
         else{
-            int playersLeft = killInfo.size() - players.size() - 1;
+            int playersLeft = players.size() - 1 - killInfo.size();
             Toast.makeText(getApplicationContext(), playersLeft + " players left  to kill.", Toast.LENGTH_LONG).show();
         }
     }
@@ -1045,9 +1076,13 @@ public class MapsActivity extends FragmentActivity implements
                                     mRoomId, sendTo);
                         }
                     })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIcon(R.drawable.ic_launcher)
                     .show();
             }
+        else if(buf[0] == 'X'){
+            //sets game mode
+            gameMode = buf[1];
+        }
         else if(buf[0] == 'A'){             //receiving message that kill is accepted
             String senderName = "Anonymous";
             for(Participant p : players){
@@ -1141,7 +1176,7 @@ public class MapsActivity extends FragmentActivity implements
             for(int p = 0; p < players.size(); p++){
                 if(sender == players.get(p).getParticipantId() && gameResults.get(p) == 0){
                     gameResults.set(p, 1); //indicates won game
-                    Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
                     break;
                 }
             }
@@ -1155,6 +1190,7 @@ public class MapsActivity extends FragmentActivity implements
      */
 
 
+    //TODO make sure these work logically
 
     // This array lists all the individual screens our game has.
     final static int[] SCREENS = {
