@@ -1,6 +1,8 @@
 package edu.gvsu.cis.klinefek.finalproject;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,9 +14,10 @@ import android.widget.TextView;
 
 public class ResultActivity extends ActionBarActivity {
 
-    private boolean win;            //whether the player won or lost
+    private boolean win;            //true is win, false is lost
     private int numberOfKills;      //number of kills in this game - to be added to total kills
     private int mode;               //1 for free-for-all, 2 for bounty hunter
+    private SharedPreferences prefs;
 
     private TextView killsInGame;
     private TextView winLoss;
@@ -32,6 +35,15 @@ public class ResultActivity extends ActionBarActivity {
         killsInGame = (TextView) findViewById(R.id.kills);
         winLoss = (TextView) findViewById(R.id.winlossmessage);
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (savedInstanceState != null) {
+            numberOfKills = savedInstanceState.getInt("kills");
+        }
+        else{
+            numberOfKills = 0;
+        }
+
         if(win) {
             winLoss.setText("You win!");
         }
@@ -40,6 +52,28 @@ public class ResultActivity extends ActionBarActivity {
         }
         killsInGame.setText(Integer.toString(numberOfKills));
         //TODO store variables representing total wins for each mode, total losses for each mode, and lifetime kills
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        numberOfKills= prefs.getInt("kills", 0);
+        killsInGame.setText(numberOfKills+"");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences.Editor ped = prefs.edit();
+        ped.putInt ("kills", numberOfKills);
+        ped.commit();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        /* outState is the name of the incoming parameter */
+        outState.putInt("kills", numberOfKills);
     }
 
     @Override
