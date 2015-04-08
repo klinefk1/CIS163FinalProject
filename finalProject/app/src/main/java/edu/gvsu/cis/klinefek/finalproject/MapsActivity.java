@@ -2,7 +2,6 @@ package edu.gvsu.cis.klinefek.finalproject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -1006,17 +1005,27 @@ public class MapsActivity extends FragmentActivity implements
                 if(mMyId.equals(players.get(p).getParticipantId()) && gameResults.get(p) == 0){
                     gameResults.set(p, 1); //indicates won game
                     Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
-                    //TODO increment variables saved on device with kills and win game mode
                     mMsgBuf[0] = 'O';
                     Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
                             mMsgBuf, mRoomId);
                     win = true;
+                    //TODO launch intent with extras to final screen
+                    Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+                    finalScreen.putExtra("mode", gameMode);
+                    finalScreen.putExtra("win", true);
+                    finalScreen.putExtra("kills", numberOfKills);
+                    startActivity(finalScreen);
                 }
 
             }
             if(!win){
                 Toast.makeText(getApplicationContext(), "You just lost the game.", Toast.LENGTH_LONG).show();
-                //TODO increment variables saved on device with kills and loss game mode
+                //TODO launch intent with extras to final screen
+                Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+                finalScreen.putExtra("mode", gameMode);
+                finalScreen.putExtra("win", false);
+                finalScreen.putExtra("kills", numberOfKills);
+                startActivity(finalScreen);
             }
         }
         else{

@@ -9,28 +9,23 @@ import android.view.View;
 import android.widget.Button;
 
 
-public class MainActivity extends ActionBarActivity {
+public class ResultActivity extends ActionBarActivity {
 
-    private Button bountyHunter, freeForAll, records, toMap;
+    private boolean win;            //whether the player won or lost
+    private int numberOfKills;      //number of kills in this game - to be added to total kills
+    private int mode;               //1 for free-for-all, 2 for bounty hunter
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.finalscreen);
 
-//        bountyHunter = (Button) findViewById(R.id.bountyHunter);
-//        freeForAll = (Button) findViewById(R.id.freeForAll);
-//        records = (Button) findViewById(R.id.records);
-        toMap = (Button) findViewById(R.id.Start);
+        Intent fromMap = getIntent();
+        win = fromMap.getBooleanExtra("win", false);
+        numberOfKills = fromMap.getIntExtra("numberOfKills", 0);
+        mode = fromMap.getIntExtra("mode", 0);
 
-        toMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent launchMap = new Intent(MainActivity.this, MapsActivity.class);
-                startActivity(launchMap);
-            }
-        });
-
+        //TODO store variables representing total wins for each mode, total losses for each mode, and lifetime kills
 
     }
 
