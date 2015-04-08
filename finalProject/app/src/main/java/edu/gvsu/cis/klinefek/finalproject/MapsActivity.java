@@ -48,22 +48,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class MapsActivity extends FragmentActivity implements
@@ -565,6 +556,7 @@ public class MapsActivity extends FragmentActivity implements
 
     //TODO add an ignore option
     //TODO Pass game mode to person accepting invite
+    //send reliable message in after a few seconds in onCreate
 
     // Called when we get an invitation to play a game. We react by showing that to the user.
     @Override
@@ -857,6 +849,13 @@ public class MapsActivity extends FragmentActivity implements
         Log.d(TAG, "Room ID: " + mRoomId);
         Log.d(TAG, "My ID " + mMyId);
         Log.d(TAG, "<< CONNECTED TO ROOM>>");
+
+        //sets game mode for all players
+        if(gameMode != 0){
+            mMsgBuf[0] = 'X';
+            mMsgBuf[1] = (byte) gameMode;
+            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, mMsgBuf, mRoomId);
+        }
     }
 
     @Override
@@ -1021,7 +1020,7 @@ public class MapsActivity extends FragmentActivity implements
             }
         }
         else{
-            int playersLeft = killInfo.size() - players.size() - 1;
+            int playersLeft = players.size() - 1 - killInfo.size();
             Toast.makeText(getApplicationContext(), playersLeft + " players left  to kill.", Toast.LENGTH_LONG).show();
         }
     }
@@ -1077,9 +1076,13 @@ public class MapsActivity extends FragmentActivity implements
                                     mRoomId, sendTo);
                         }
                     })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIcon(R.drawable.ic_launcher)
                     .show();
             }
+        else if(buf[0] == 'X'){
+            //sets game mode
+            gameMode = buf[1];
+        }
         else if(buf[0] == 'A'){             //receiving message that kill is accepted
             String senderName = "Anonymous";
             for(Participant p : players){
@@ -1173,7 +1176,7 @@ public class MapsActivity extends FragmentActivity implements
             for(int p = 0; p < players.size(); p++){
                 if(sender == players.get(p).getParticipantId() && gameResults.get(p) == 0){
                     gameResults.set(p, 1); //indicates won game
-                    Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
                     break;
                 }
             }
