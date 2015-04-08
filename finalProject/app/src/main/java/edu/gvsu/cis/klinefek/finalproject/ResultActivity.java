@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 
 public class ResultActivity extends ActionBarActivity {
@@ -15,6 +16,9 @@ public class ResultActivity extends ActionBarActivity {
     private int numberOfKills;      //number of kills in this game - to be added to total kills
     private int mode;               //1 for free-for-all, 2 for bounty hunter
 
+    private TextView killsInGame;
+    private TextView winLoss;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,11 +26,20 @@ public class ResultActivity extends ActionBarActivity {
 
         Intent fromMap = getIntent();
         win = fromMap.getBooleanExtra("win", false);
-        numberOfKills = fromMap.getIntExtra("numberOfKills", 0);
+        numberOfKills = fromMap.getIntExtra("kills", 0);
         mode = fromMap.getIntExtra("mode", 0);
 
-        //TODO store variables representing total wins for each mode, total losses for each mode, and lifetime kills
+        killsInGame = (TextView) findViewById(R.id.kills);
+        winLoss = (TextView) findViewById(R.id.winlossmessage);
 
+        if(win) {
+            winLoss.setText("You win!");
+        }
+        else{
+            winLoss.setText("You lose!");
+        }
+        killsInGame.setText(Integer.toString(numberOfKills));
+        //TODO store variables representing total wins for each mode, total losses for each mode, and lifetime kills
     }
 
     @Override

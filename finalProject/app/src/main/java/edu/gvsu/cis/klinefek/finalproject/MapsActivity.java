@@ -219,10 +219,9 @@ public class MapsActivity extends FragmentActivity implements
                         .setMessage(message)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-
                             }
                         })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setIcon(R.drawable.ic_launcher)
                         .show();
             }
 
@@ -509,7 +508,7 @@ public class MapsActivity extends FragmentActivity implements
                             // do nothing
                         }
                     })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIcon(R.drawable.ic_launcher)
                     .show();
 
             return false;
@@ -520,9 +519,11 @@ public class MapsActivity extends FragmentActivity implements
     private void checkResponse(boolean leave){
         if(leave){
             leaveRoom();
-            Intent intent = new Intent(MapsActivity.this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+            Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+            finalScreen.putExtra("mode", gameMode);
+            finalScreen.putExtra("win", false);
+            finalScreen.putExtra("kills", numberOfKills);
+            startActivity(finalScreen);
             finish();
         }
     }
@@ -554,7 +555,6 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     //TODO add an ignore option
-    //TODO Pass game mode to person accepting invite
     //send reliable message in after a few seconds in onCreate
 
     // Called when we get an invitation to play a game. We react by showing that to the user.
@@ -998,7 +998,6 @@ public class MapsActivity extends FragmentActivity implements
     private void checkGameOver(){
         if(killInfo.size() == players.size() - 1){
             //game is over
-            //TODO intent to final screen
             //return intent to final screen
             boolean win = false;
             for(int p = 0; p < players.size(); p++){
@@ -1009,23 +1008,25 @@ public class MapsActivity extends FragmentActivity implements
                     Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
                             mMsgBuf, mRoomId);
                     win = true;
-                    //TODO launch intent with extras to final screen
+                    leaveRoom();
                     Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
                     finalScreen.putExtra("mode", gameMode);
                     finalScreen.putExtra("win", true);
                     finalScreen.putExtra("kills", numberOfKills);
                     startActivity(finalScreen);
+                    finish();
                 }
 
             }
             if(!win){
                 Toast.makeText(getApplicationContext(), "You just lost the game.", Toast.LENGTH_LONG).show();
-                //TODO launch intent with extras to final screen
+                leaveRoom();
                 Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
                 finalScreen.putExtra("mode", gameMode);
                 finalScreen.putExtra("win", false);
                 finalScreen.putExtra("kills", numberOfKills);
                 startActivity(finalScreen);
+                finish();
             }
         }
         else{

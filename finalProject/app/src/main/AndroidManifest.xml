@@ -52,6 +52,11 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
+            android:name=".ResultActivity"
+            android:label="@string/resultsstring"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
             android:name=".GooglePlayServicesActivity"
             android:label="@string/title_activity_google_play_services"
             android:screenOrientation="portrait">

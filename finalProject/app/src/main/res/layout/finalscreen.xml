@@ -16,14 +16,6 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Play again with this group"
-        android:id="@+id/playAgainThisGroup"
-        android:layout_above="@+id/goToOpening"
-        android:layout_centerHorizontal="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="Return to Opening Screen"
         android:id="@+id/goToOpening"
         android:layout_alignParentBottom="true"
@@ -37,5 +29,25 @@
         android:id="@+id/stats"
         android:layout_below="@+id/winlossmessage"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Number of Kills in this Game:"
+        android:id="@+id/killsLabel"
+        android:layout_below="@+id/stats"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="809"
+        android:id="@+id/kills"
+        android:layout_alignTop="@+id/killsLabel"
+        android:layout_toRightOf="@+id/killsLabel"
+        android:layout_toEndOf="@+id/killsLabel" />
 
 </RelativeLayout>
