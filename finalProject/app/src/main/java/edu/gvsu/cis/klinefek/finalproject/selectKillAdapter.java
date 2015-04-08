@@ -48,7 +48,7 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
             picture = (ImageView) itemView.findViewById(R.id.playerImg);
             playerId = (TextView) itemView.findViewById(R.id.playerId);
 
-            //returns the player ID
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     TextView t = (TextView) itemView.findViewById(R.id.playerId);

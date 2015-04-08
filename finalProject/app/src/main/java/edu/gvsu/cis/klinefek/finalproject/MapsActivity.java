@@ -522,6 +522,9 @@ public class MapsActivity extends FragmentActivity implements
 
     private void checkResponse(boolean leave){
         if(leave){
+            mMsgBuf[0] = 'V';   //player forfeits the game
+            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, mMsgBuf, mRoomId);
+
             leaveRoom();
             Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
             finalScreen.putExtra("mode", gameMode);
@@ -1001,7 +1004,13 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     private void checkGameOver(){
-        if(killInfo.size() == players.size() - 1){
+        int numRemaining =  0;
+        for(int i : gameResults){
+            if(i == 0){
+                numRemaining++;
+            }
+        }
+        if(numRemaining <= 1){
             //game is over
             //return intent to final screen
             boolean win = false;
@@ -1035,7 +1044,7 @@ public class MapsActivity extends FragmentActivity implements
             }
         }
         else{
-            int playersLeft = players.size() - 1 - killInfo.size();
+            int playersLeft = numRemaining - 1;
             Toast.makeText(getApplicationContext(), playersLeft + " players left  to kill.", Toast.LENGTH_LONG).show();
         }
     }
@@ -1094,6 +1103,24 @@ public class MapsActivity extends FragmentActivity implements
                     .setIcon(R.drawable.ic_launcher)
                     .show();
             }
+        //TODO verify this works with multiple players
+        else if(buf[0] == 'V'){
+            int playerIndex = 0;
+            String playerName = "error";
+
+            for(int i = 0; i < players.size(); i++){
+                if(sender.equals(players.get(i).getParticipantId())){
+                    playerIndex = i;
+                    playerName = players.get(i).getDisplayName();
+                }
+            }
+
+            gameResults.set(playerIndex, 2);
+
+            Toast.makeText(getApplicationContext(), playerName + " left the game.", Toast.LENGTH_LONG).show();
+            checkGameOver();
+
+        }
         else if(buf[0] == 'X'){
             //sets game mode
             gameMode = buf[1];
@@ -1143,7 +1170,6 @@ public class MapsActivity extends FragmentActivity implements
 
 
         else if(buf[0] == 'S'){             //message received to all players set new kill marker
-            //TODO find out if this is dangerous on other systems
             double lat = toDouble(Arrays.copyOfRange(buf, 1, 9));
             double lon = toDouble(Arrays.copyOfRange(buf, 9, 17));
 
@@ -1321,7 +1347,6 @@ public class MapsActivity extends FragmentActivity implements
                 break;
             case R.id.button_decline_popup_invitation:
                 //TODO hide invitation popup
-
                 findViewById(R.id.invitation_popup).setVisibility(View.GONE);
                 break;
         }
