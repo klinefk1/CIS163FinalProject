@@ -1,6 +1,5 @@
 Things that need done for the final project:
 
-
 	-store data after game completes - I believe we had a lab about something similar to this 
 		-things could be updated (saved on system)
 			- Free-For-All Wins +1 or 
@@ -17,7 +16,6 @@ Things that need done for the final project:
 		- kill single player multiple times
 		-Austin
 
-
 	-add instructions activity accessable from main screen
 		-Austin
 
@@ -28,9 +26,6 @@ Things that need done for the final project:
 	-figure out what to do in the final screen (probably display 'you win' or something and button to take player back to first screen)
 		-Mike
 
-	-figure out why set URI in recyclerView is not working when picture is available
-		(also remove player from list of people to kill...but later so that we can see multiple people on list while testing)
-		-Katherine
 
 	-debug game logic
 		-Katherine
@@ -38,3 +33,5 @@ Things that need done for the final project:
 	optional:
 	- add leaderboard (google developer has API for that)
 
+
+	8am-1pm engineering project day

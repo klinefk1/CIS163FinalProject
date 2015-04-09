@@ -162,12 +162,7 @@
             <TextView android:id="@+id/incoming_invitation_text" style="@style/InvPopupText" />
             <Button android:id="@+id/button_accept_popup_invitation"
                 style="@style/InvPopupButton"
-                android:text="@string/accept_popup_invite"
-                android:padding="2dp"/>
-            <Button android:id="@+id/button_decline_popup_invitation"
-                style="@style/InvPopupButton"
-                android:text="@string/dismiss_popup_invite"
-                android:padding="2dp"/>
+                android:text="@string/accept_popup_invite"/>
         </LinearLayout>
 
         <!-- "PLEASE WAIT" SCREEN -->

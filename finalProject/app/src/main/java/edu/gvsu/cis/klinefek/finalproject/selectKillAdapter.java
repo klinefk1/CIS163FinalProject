@@ -129,11 +129,6 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
             //default image if the player does not have one
             tmp.picture.setImageResource(R.drawable.ic_launcher);
         }
-
-
-        //TODO fix image upload
-
-
     }
 
     @Override

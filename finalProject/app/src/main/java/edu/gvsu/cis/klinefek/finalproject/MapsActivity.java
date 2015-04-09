@@ -568,7 +568,6 @@ public class MapsActivity extends FragmentActivity implements
         startActivityForResult(i, RC_WAITING_ROOM);
     }
 
-    //TODO add an ignore option
     //send reliable message in after a few seconds in onCreate
 
     // Called when we get an invitation to play a game. We react by showing that to the user.
@@ -743,14 +742,14 @@ public class MapsActivity extends FragmentActivity implements
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
 
-    //TODO make zoom happen on initialization, but not constantly afterward
+    //TODO make zoom happen on initialization, but not constantly afterward if time permits
 
     @Override
     public void onLocationChanged(Location location) {
         LatLng geoPos = new LatLng(location.getLatitude(), location.getLongitude());
         CameraPosition campos = CameraPosition.builder()
                 .target(geoPos)
-                .zoom(14)
+                .zoom(15)
                 .build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(campos));
         if (myMarker == null) /*if we don't have a marker yet, create and add */ {
@@ -873,11 +872,12 @@ public class MapsActivity extends FragmentActivity implements
             if(gameMode == 2) {
                 int pickPlayer = (int) (Math.random() * players.size());
                 theHunted = players.get(pickPlayer);
-            }
 
-            byte[] hunted = theHunted.getParticipantId().getBytes();
-            for(int i = 0; i < hunted.length; i++){
-                message[i+2] = hunted[i];
+
+                byte[] hunted = theHunted.getParticipantId().getBytes();
+                for (int i = 0; i < hunted.length; i++) {
+                    message[i + 2] = hunted[i];
+                }
             }
 
             Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
@@ -1134,6 +1134,14 @@ public class MapsActivity extends FragmentActivity implements
                             mMsgBuf[0] = 'A';
                             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
                                     mRoomId, sendTo);
+                            leaveRoom();
+                            //intent to final screen
+                            Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+                            finalScreen.putExtra("mode", gameMode);
+                            finalScreen.putExtra("win", false);
+                            finalScreen.putExtra("kills", numberOfKills);
+                            startActivity(finalScreen);
+                            finish();
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1146,7 +1154,6 @@ public class MapsActivity extends FragmentActivity implements
                     .setIcon(R.drawable.ic_launcher)
                     .show();
             }
-        //TODO verify this works with multiple players
         else if(buf[0] == 'V'){
             int playerIndex = 0;
             String playerName = "error";
@@ -1166,7 +1173,7 @@ public class MapsActivity extends FragmentActivity implements
         }
         else if(buf[0] == 'X'){
             //sets game mode
-            gameMode = buf[1];
+            gameMode = (int) buf[1];
 
             if(gameMode == 2) {
                 //byte array to string
@@ -1187,7 +1194,6 @@ public class MapsActivity extends FragmentActivity implements
                         break;
                     }
                 }
-                //TODO change icon to display the player's image
 
                 String lookingFor = "The player you're looking for is " + theHunted.getDisplayName();
                 String youAreTheHunted = "Everyone is after you!";
@@ -1309,7 +1315,6 @@ public class MapsActivity extends FragmentActivity implements
                     break;
                 }
             }
-            //TODO find out why losing player gets 2 result calls
             checkGameOver();
         }
     }
@@ -1382,6 +1387,7 @@ public class MapsActivity extends FragmentActivity implements
     public void onClick(View v) {
         Intent intent;
         //TODO implement game modes
+
         switch (v.getId()) {
             case R.id.freeForAll:
                 // show list of invitable players
@@ -1432,10 +1438,6 @@ public class MapsActivity extends FragmentActivity implements
                 // (the one we got through the OnInvitationReceivedListener).
                 acceptInviteToRoom(mIncomingInvitationId);
                 mIncomingInvitationId = null;
-                break;
-            case R.id.button_decline_popup_invitation:
-                //TODO hide invitation popup
-                findViewById(R.id.invitation_popup).setVisibility(View.GONE);
                 break;
         }
     }
