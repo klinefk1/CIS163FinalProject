@@ -37,6 +37,16 @@
         android:textColor="#ffff0000"
         android:visibility="gone"/>
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/knifeImage"
+        android:src="@drawable/knife"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/returnToMap"
+        android:visibility="gone"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -48,6 +58,8 @@
         android:layout_below="@+id/inGameInstructions"
         android:textColor="#ffff0000"
         android:textSize="40dp" />
+
+
 
     <FrameLayout
         android:layout_width="fill_parent"
