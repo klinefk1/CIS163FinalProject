@@ -108,20 +108,23 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         if(livingOpponents.get(i).getIconImageUrl() != null) {
 
-        String pic = livingOpponents.get(i).getIconImageUrl();
-        Bitmap img = null;
-        try {
-            img = new ImageSetTask().execute(pic).get();
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        tmp.picture.setImageBitmap(img);
+            String pic = livingOpponents.get(i).getIconImageUrl();
+            Bitmap img = null;
+            try {
+                img = new ImageSetTask().execute(pic).get();
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+            if(img != null)
+                tmp.picture.setImageBitmap(img);
+            else
+                tmp.picture.setImageResource(R.drawable.ic_launcher);
 
-        }
+            }
         else{
             //default image if the player does not have one
             tmp.picture.setImageResource(R.drawable.ic_launcher);
