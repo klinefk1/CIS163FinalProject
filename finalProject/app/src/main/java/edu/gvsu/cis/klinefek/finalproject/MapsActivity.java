@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.images.ImageManager;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesStatusCodes;
@@ -1444,4 +1445,6 @@ public class MapsActivity extends FragmentActivity implements
         Log.d("Message Sent", "sent");
 
     }
+
+
 }
