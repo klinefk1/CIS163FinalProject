@@ -32,7 +32,7 @@ public class ResultActivity extends ActionBarActivity {
         numberOfKills = fromMap.getIntExtra("kills", 0);
         mode = fromMap.getIntExtra("mode", 0);
 
-        killsInGame = (TextView) findViewById(R.id.kills);
+        killsInGame = (TextView) findViewById(R.id.numkills);
         winLoss = (TextView) findViewById(R.id.winlossmessage);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
