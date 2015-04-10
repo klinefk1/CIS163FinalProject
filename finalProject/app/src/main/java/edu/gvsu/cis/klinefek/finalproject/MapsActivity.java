@@ -297,6 +297,7 @@ public class MapsActivity extends FragmentActivity implements
                                     Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
                                             mRoomId, playerKilled.getParticipantId());
                                 } else
+                                    //This should never happen
                                     Toast.makeText(getApplicationContext(), playerKilled.getDisplayName() + " is not a valid player.", Toast.LENGTH_LONG).show();
                             } else {
                                 Toast.makeText(getApplicationContext(), "You are dead.  You can't " +
@@ -945,17 +946,6 @@ public class MapsActivity extends FragmentActivity implements
             message[0] = 'X';
             message[1] = (byte) gameMode;
 
-//            if(gameMode == 2) {
-//                int pickPlayer = (int) (Math.random() * players.size());
-//                theHunted = players.get(pickPlayer);
-//
-//
-//                byte[] hunted = theHunted.getParticipantId().getBytes();
-//                for (int i = 0; i < hunted.length; i++) {
-//                    message[i + 2] = hunted[i];
-//                }
-//            }
-
             //used to randomize who is supposed to kill whom in Bounty Hunter
             if(gameMode == 2) {
 
@@ -963,29 +953,12 @@ public class MapsActivity extends FragmentActivity implements
                 //randomizes the numbers in the array for number of people playing
 
                 for(int j = 0; j < players.size(); j++) {
-
+                    final int n = players.size();
                     if(players.get(j).getParticipantId().equals(mMyId)){
-                        if(j == players.size()-1){
-                            theHunted = players.get(0);
-                        }
-                        else{
-                            theHunted = players.get(j+1);
-                        }
-                    }
-                    else if(j < players.size() -1) {
-                        String toKill = players.get(j+1).getParticipantId();
-                        byte[] hunted = toKill.getBytes();
-
-                        for(int k = 0; k < hunted.length; k++){
-                            message[k+2] = hunted[k];
-                        }
-
-
-                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
-                                mRoomId, players.get(j).getParticipantId());
+                            theHunted = players.get((j+1) % n);
                     }
                     else{
-                        String toKill = players.get(0).getParticipantId();
+                        String toKill = players.get((j+1) % n).getParticipantId();
                         byte[] hunted = toKill.getBytes();
 
                         for(int k = 0; k < hunted.length; k++){
@@ -1332,6 +1305,7 @@ public class MapsActivity extends FragmentActivity implements
             }
         }
         else if(buf[0] == 'V'){
+            //The player left the game
             int playerIndex = 0;
             String playerName = "error";
 
