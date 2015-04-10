@@ -39,12 +39,22 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/knifeImage"
         android:src="@drawable/knife"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/returnToMap"
+        android:visibility="gone"/>
+    <ImageView
+        android:layout_width="500px"
+        android:layout_height="500px"
+        android:paddingTop="20px"
+        android:id="@+id/bountyplayer"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_below="@+id/selectkill"
+        android:src="@drawable/ic_launcher"
         android:visibility="gone"/>
 
     <TextView

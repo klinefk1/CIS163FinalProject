@@ -2,10 +2,15 @@ package edu.gvsu.cis.klinefek.finalproject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.AsyncTask;
+import android.os.Vibrator;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,7 +27,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.images.ImageManager;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesStatusCodes;
@@ -49,13 +53,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public class MapsActivity extends FragmentActivity implements
@@ -76,17 +85,17 @@ public class MapsActivity extends FragmentActivity implements
     private TextView selectkill;
     private TextView instructions;
     private ImageView knifeImg;
+    private ImageView bountyPlayer;
     private ArrayList<LatLng> killLocations;
     private ArrayList<String> killInfo;
     private ArrayList<String> killTitle;
+
 
 
     //game logic
     private int gameMode = 0;  //0 = not selected, 1 = free-for-all, 2 = bounty hunter
     private boolean gameStarted;
     private Participant theHunted;  //target player in bounty hunter
-    private boolean huntedKilled;   //true after the player is killed
-    private String huntedKiller; //ID of person who kills theHunted
     private FrameLayout mapDisplay;
     private FrameLayout killDisplay;
     private RecyclerView selectPlayer;
@@ -190,10 +199,10 @@ public class MapsActivity extends FragmentActivity implements
         selectkill = (TextView) findViewById(R.id.selectkill);
         instructions = (TextView) findViewById(R.id.inGameInstructions);
         knifeImg = (ImageView) findViewById(R.id.knifeImage);
+        bountyPlayer = (ImageView) findViewById(R.id.bountyplayer);
 
 
         numberOfKills = 0;
-        huntedKilled = false;
 
         selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
         selectPlayerManager = new LinearLayoutManager(getApplicationContext());
@@ -219,7 +228,7 @@ public class MapsActivity extends FragmentActivity implements
                     message = getString(R.string.mode1instructions);
                 }
                 else if(gameMode == 2) {
-                    //set message to bounty hunter
+                    //set message to bounty hunter - the if should never happen
                     if(theHunted.getParticipantId().equals(mMyId)){
                         message = "Bounty Hunter\nYou are the target!\n" + getString(R.string.mode2instructions);
                     }
@@ -315,9 +324,36 @@ public class MapsActivity extends FragmentActivity implements
                         returnToMap.setVisibility(View.VISIBLE);
                         selectkill.setText("Push to Kill\n" + theHunted.getDisplayName());
                         selectkill.setVisibility(View.VISIBLE);
+                        bountyPlayer.setVisibility(View.VISIBLE);
                         //TODO add an imageView here for theHunted
 
-                        knifeImg.setOnClickListener(new View.OnClickListener() {
+                        if(theHunted.getIconImageUrl() != null) {
+
+                            String pic = theHunted.getHiResImageUrl();
+                            Bitmap img = null;
+                            try {
+                                img = new ImageSetTask().execute(pic).get();
+                            }
+                            catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            catch (ExecutionException e) {
+                                e.printStackTrace();
+                            }
+                            if(img != null) {
+                                   bountyPlayer.setImageBitmap(img);
+                            }
+                            else {
+                                   bountyPlayer.setImageResource(R.drawable.ic_launcher);
+                            }
+
+                        }
+                        else{
+                            //default image if the player does not have one
+                            bountyPlayer.setImageResource(R.drawable.ic_launcher);
+                        }
+
+                        bountyPlayer.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 mMsgBuf[0] = 'K';
@@ -342,6 +378,7 @@ public class MapsActivity extends FragmentActivity implements
                 mapDisplay.setVisibility(View.VISIBLE);
                 kill.setVisibility(View.VISIBLE);
                 knifeImg.setVisibility(View.GONE);
+                bountyPlayer.setVisibility(View.GONE);
             }
         });
 
@@ -508,9 +545,11 @@ public class MapsActivity extends FragmentActivity implements
     public boolean onKeyDown(int keyCode, KeyEvent e) {
         if(!gameStarted && mCurScreen != R.id.screen_main){
             switchToScreen(R.id.screen_main);
+            gameMode = 0;
             return false;
         }
         else if (!gameStarted){
+            gameMode = 0;
             finish();
             return false;
         }
@@ -531,6 +570,7 @@ public class MapsActivity extends FragmentActivity implements
             mapDisplay.setVisibility(View.VISIBLE);
             kill.setVisibility(View.VISIBLE);
             knifeImg.setVisibility(View.GONE);
+            bountyPlayer.setVisibility(View.GONE);
             return false;
         }
 
@@ -585,8 +625,10 @@ public class MapsActivity extends FragmentActivity implements
             Games.RealTimeMultiplayer.leave(mGoogleApiClient, this, mRoomId);
             mRoomId = null;
             switchToScreen(R.id.screen_main);
+            gameMode = 0;
         } else {
             switchToMainScreen();
+            gameMode = 0;
         }
     }
 
@@ -902,20 +944,62 @@ public class MapsActivity extends FragmentActivity implements
             message[0] = 'X';
             message[1] = (byte) gameMode;
 
+//            if(gameMode == 2) {
+//                int pickPlayer = (int) (Math.random() * players.size());
+//                theHunted = players.get(pickPlayer);
+//
+//
+//                byte[] hunted = theHunted.getParticipantId().getBytes();
+//                for (int i = 0; i < hunted.length; i++) {
+//                    message[i + 2] = hunted[i];
+//                }
+//            }
+
+            //used to randomize who is supposed to kill whom in Bounty Hunter
             if(gameMode == 2) {
-                int pickPlayer = (int) (Math.random() * players.size());
-                theHunted = players.get(pickPlayer);
+
+                Collections.shuffle(Arrays.asList(players));
+                //randomizes the numbers in the array for number of people playing
+
+                for(int j = 0; j < players.size(); j++) {
+
+                    if(players.get(j).getParticipantId().equals(mMyId)){
+                        if(j == players.size()-1){
+                            theHunted = players.get(0);
+                        }
+                        else{
+                            theHunted = players.get(j+1);
+                        }
+                    }
+                    else if(j < players.size() -1) {
+                        String toKill = players.get(j+1).getParticipantId();
+                        byte[] hunted = toKill.getBytes();
+
+                        for(int k = 0; k < hunted.length; k++){
+                            message[k+2] = hunted[k];
+                        }
 
 
-                byte[] hunted = theHunted.getParticipantId().getBytes();
-                for (int i = 0; i < hunted.length; i++) {
-                    message[i + 2] = hunted[i];
+                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
+                                mRoomId, players.get(j).getParticipantId());
+                    }
+                    else{
+                        String toKill = players.get(0).getParticipantId();
+                        byte[] hunted = toKill.getBytes();
+
+                        for(int k = 0; k < hunted.length; k++){
+                            message[k+2] = hunted[k];
+                        }
+
+                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
+                                mRoomId, players.get(j).getParticipantId());
+                    }
                 }
+
             }
 
-            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
-
             String lookingFor = "The player you're looking for is " + theHunted.getDisplayName();
+            //this should never happen
             String youAreTheHunted = "Everyone is after you!";
 
             String message2;
@@ -1079,56 +1163,20 @@ public class MapsActivity extends FragmentActivity implements
         return info;
     }
 
-    private void checkGameOver(){
-        if(gameMode == 1) {
-            int numRemaining = 0;
-            for (int i : gameResults) {
-                if (i == 0) {
-                    numRemaining++;
-                }
-            }
-            if (numRemaining <= 1) {
-                //game is over
-                //return intent to final screen
-                boolean win = false;
-                for (int p = 0; p < players.size(); p++) {
-                    if (mMyId.equals(players.get(p).getParticipantId()) && gameResults.get(p) == 0) {
-                        gameResults.set(p, 1); //indicates won game
-                        Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
-                        mMsgBuf[0] = 'O';
-                        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
-                                mMsgBuf, mRoomId);
-                        win = true;
-                        leaveRoom();
-                        Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-                        finalScreen.putExtra("mode", gameMode);
-                        finalScreen.putExtra("win", true);
-                        finalScreen.putExtra("kills", numberOfKills);
-                        startActivity(finalScreen);
-                        finish();
-                    }
-
-                }
-                if (!win) {
-                    Toast.makeText(getApplicationContext(), "You just lost the game.", Toast.LENGTH_LONG).show();
-                    leaveRoom();
-                    Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-                    finalScreen.putExtra("mode", gameMode);
-                    finalScreen.putExtra("win", false);
-                    finalScreen.putExtra("kills", numberOfKills);
-                    startActivity(finalScreen);
-                    finish();
-                }
-            } else {
-                int playersLeft = numRemaining - 1;
-                Toast.makeText(getApplicationContext(), playersLeft + " players left  to kill.", Toast.LENGTH_LONG).show();
+    private void checkGameOver() {
+        int numRemaining = 0;
+        for (int i : gameResults) {
+            if (i == 0) {
+                numRemaining++;
             }
         }
-        else if(gameMode == 2){
+        if (numRemaining <= 1) {
+            //game is over
+            //return intent to final screen
             boolean win = false;
-            if(huntedKilled){
-                if(mMyId.equals(huntedKiller)){
-                    //win
+            for (int p = 0; p < players.size(); p++) {
+                if (mMyId.equals(players.get(p).getParticipantId()) && gameResults.get(p) == 0) {
+                    gameResults.set(p, 1); //indicates won game
                     Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
                     mMsgBuf[0] = 'O';
                     Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
@@ -1138,26 +1186,25 @@ public class MapsActivity extends FragmentActivity implements
                     Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
                     finalScreen.putExtra("mode", gameMode);
                     finalScreen.putExtra("win", true);
-                    finalScreen.putExtra("kills", 1);
+                    finalScreen.putExtra("kills", numberOfKills);
                     startActivity(finalScreen);
                     finish();
                 }
-                else{
-                    //lose
-                    Toast.makeText(getApplicationContext(), "You just lost the game.", Toast.LENGTH_LONG).show();
-                    leaveRoom();
-                    Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-                    finalScreen.putExtra("mode", gameMode);
-                    finalScreen.putExtra("win", false);
-                    finalScreen.putExtra("kills", 0);
-                    startActivity(finalScreen);
-                    finish();
-                }
+
             }
-            else{
-                Toast.makeText(getApplicationContext(), "The game is not over yet.  Find and kill " +
-                        theHunted.getDisplayName(), Toast.LENGTH_LONG).show();
+            if (!win) {
+                Toast.makeText(getApplicationContext(), "You just lost the game.", Toast.LENGTH_LONG).show();
+                leaveRoom();
+                Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+                finalScreen.putExtra("mode", gameMode);
+                finalScreen.putExtra("win", false);
+                finalScreen.putExtra("kills", numberOfKills);
+                startActivity(finalScreen);
+                finish();
             }
+        } else {
+            int playersLeft = numRemaining - 1;
+            Toast.makeText(getApplicationContext(), playersLeft + " players left  to kill.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1175,6 +1222,11 @@ public class MapsActivity extends FragmentActivity implements
     // 'S' message, which indicates that the game should start.
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage rtm) {
+        //Makes phone vibrate when message is received
+        Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(500);
+
+
         byte[] buf = rtm.getMessageData();
         final String sender = rtm.getSenderParticipantId();
         Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
@@ -1239,11 +1291,22 @@ public class MapsActivity extends FragmentActivity implements
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
 
-                                huntedKilled = true;
-                                huntedKiller = sender;
+                                for (int p = 0; p < players.size(); p++) {
+                                    if (mMyId.equals(players.get(p).getParticipantId())) {
+                                        gameResults.set(p, 2); //indicates lost game
+                                    }
+                                }
 
-                                mMsgBuf[0] = 'A';
-                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                byte[] message = new byte[25];
+                                message[0] = 'A';
+
+                                byte[] newTarget = theHunted.getParticipantId().getBytes();
+
+                                for(int i = 0; i< newTarget.length; i++){
+                                    message[i+1] = newTarget[i];
+                                }
+
+                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
                                         mRoomId, sendTo);
                                 leaveRoom();
                                 //intent to final screen
@@ -1307,16 +1370,8 @@ public class MapsActivity extends FragmentActivity implements
                     }
                 }
 
-                String lookingFor = "The player you're looking for is " + theHunted.getDisplayName();
-                String youAreTheHunted = "Everyone is after you!";
+                String message = "The player you're looking for is " + theHunted.getDisplayName();
 
-                String message;
-                if(mMyId.equals(theHunted.getParticipantId())){
-                    message = youAreTheHunted;
-                }
-                else{
-                    message = lookingFor;
-                }
 
                 new AlertDialog.Builder(MapsActivity.this) //
                         .setTitle("Bounty Hunter")
@@ -1370,10 +1425,26 @@ public class MapsActivity extends FragmentActivity implements
             }
             else if(gameMode == 2){
 
+                int strLen = 0;
+                for(int i = 0; i < buf.length; i++){
+                    if(buf[i] != 0){
+                        strLen++;
+                    }
+                }
+                String newTarget = new String(Arrays.copyOfRange(buf, 1, strLen));
+                for(Participant p : players){
+                    if(newTarget.equals(p.getParticipantId())){
+                        theHunted = p;
+                        break;
+                    }
+                }
+
                 numberOfKills++;
                 confirmedKill = true;
+
+                //TODO if this works, make it into an alert but only if gameOver is false
                 Toast.makeText(getApplicationContext(), theHunted.getDisplayName() +
-                        " was killed.", Toast.LENGTH_LONG).show();
+                        " is your new target", Toast.LENGTH_LONG).show();
 
                 String myName = "Error";
                 for (Participant p : players) {
@@ -1384,8 +1455,11 @@ public class MapsActivity extends FragmentActivity implements
                 }
                 setKillMarker(myName, theHunted.getDisplayName(), sender);
 
-                huntedKiller = mMyId;
-                huntedKilled = true;
+                for (int p = 0; p < players.size(); p++) {
+                    if (sender.equals(players.get(p).getParticipantId())) {
+                        gameResults.set(p, 2); //indicates lost game
+                    }
+                }
 
                 //switch from map to recyclerView
                 killDisplay.setVisibility(View.GONE);
@@ -1450,17 +1524,12 @@ public class MapsActivity extends FragmentActivity implements
             checkGameOver();
         }
         else if(buf[0] == 'O'){
-            if(gameMode == 1) {
-                for (int p = 0; p < players.size(); p++) {
-                    if (sender == players.get(p).getParticipantId() && gameResults.get(p) == 0) {
-                        gameResults.set(p, 1); //indicates won game
-                        //Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
-                        break;
-                    }
+            for (int p = 0; p < players.size(); p++) {
+                if (sender == players.get(p).getParticipantId() && gameResults.get(p) == 0) {
+                    gameResults.set(p, 1); //indicates won game
+                    //Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
+                    break;
                 }
-            }
-            else if(gameMode == 2){
-                huntedKilled = true;
             }
             checkGameOver();
         }
@@ -1593,5 +1662,41 @@ public class MapsActivity extends FragmentActivity implements
 
     }
 
+
+    public class ImageSetTask extends AsyncTask<String, Void, Bitmap> {
+        //loads the poster image of a given TV show or movie and sets it
+        //in the imageView on the UI
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            try {
+                URL urlConnection = new URL(params[0]);
+                HttpURLConnection connection = (HttpURLConnection) urlConnection
+                        .openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                return myBitmap;
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            super.onPostExecute(result);
+
+            try {
+
+            }
+            catch (Exception e){
+
+            }
+        }
+
+    }
 
 }
