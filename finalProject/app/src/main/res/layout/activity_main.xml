@@ -6,7 +6,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
     android:clickable="false"
-    android:background="@drawable/ninja"
+    android:background="@drawable/ninjaresized"
     android:id="@+id/what">
 
     <TextView
@@ -19,7 +19,7 @@
         android:textColor="#B22222"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:textSize="50sp" />
+        android:textSize="60sp" />
 
     <Button
         android:layout_width="wrap_content"

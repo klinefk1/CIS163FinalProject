@@ -122,12 +122,12 @@ public class selectKillAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHo
             if(img != null)
                 tmp.picture.setImageBitmap(img);
             else
-                tmp.picture.setImageResource(R.drawable.ic_launcher);
+                tmp.picture.setImageResource(R.drawable.ninjaforprofilepic);
 
             }
         else{
             //default image if the player does not have one
-            tmp.picture.setImageResource(R.drawable.ic_launcher);
+            tmp.picture.setImageResource(R.drawable.ninjaforprofilepic);
         }
     }
 

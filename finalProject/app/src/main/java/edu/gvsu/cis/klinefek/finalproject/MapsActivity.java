@@ -66,7 +66,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-
+//TODO check Toast and replace with alert popups when appropriate
 public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -96,6 +96,7 @@ public class MapsActivity extends FragmentActivity implements
     private int gameMode = 0;  //0 = not selected, 1 = free-for-all, 2 = bounty hunter
     private boolean gameStarted;
     private Participant theHunted;  //target player in bounty hunter
+    private boolean gameOver;
     private FrameLayout mapDisplay;
     private FrameLayout killDisplay;
     private RecyclerView selectPlayer;
@@ -344,13 +345,13 @@ public class MapsActivity extends FragmentActivity implements
                                    bountyPlayer.setImageBitmap(img);
                             }
                             else {
-                                   bountyPlayer.setImageResource(R.drawable.ic_launcher);
+                                   bountyPlayer.setImageResource(R.drawable.ninjaforprofilepic);
                             }
 
                         }
                         else{
                             //default image if the player does not have one
-                            bountyPlayer.setImageResource(R.drawable.ic_launcher);
+                            bountyPlayer.setImageResource(R.drawable.ninjaforprofilepic);
                         }
 
                         bountyPlayer.setOnClickListener(new View.OnClickListener() {
@@ -995,30 +996,32 @@ public class MapsActivity extends FragmentActivity implements
                                 mRoomId, players.get(j).getParticipantId());
                     }
                 }
+                String lookingFor = "The player you're looking for is " + theHunted.getDisplayName();
+                //this should never happen
+                String youAreTheHunted = "Everyone is after you!";
+
+                String message2;
+                if(mMyId.equals(theHunted.getParticipantId())){
+                    message2 = youAreTheHunted;
+                }
+                else{
+                    message2 = lookingFor;
+                }
+
+                new AlertDialog.Builder(MapsActivity.this) //
+                        .setTitle("Bounty Hunter")
+                        .setMessage(message2)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .setIcon(R.drawable.ic_launcher)
+                        .show();
 
             }
-
-            String lookingFor = "The player you're looking for is " + theHunted.getDisplayName();
-            //this should never happen
-            String youAreTheHunted = "Everyone is after you!";
-
-            String message2;
-            if(mMyId.equals(theHunted.getParticipantId())){
-                message2 = youAreTheHunted;
+            else if(gameMode == 1){
+                Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
             }
-            else{
-                message2 = lookingFor;
-            }
-
-            new AlertDialog.Builder(MapsActivity.this) //
-                    .setTitle("Bounty Hunter")
-                    .setMessage(message2)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    })
-                    .setIcon(R.drawable.ic_launcher)
-                    .show();
         }
     }
 
@@ -1174,10 +1177,10 @@ public class MapsActivity extends FragmentActivity implements
             //game is over
             //return intent to final screen
             boolean win = false;
+            gameOver= true;
             for (int p = 0; p < players.size(); p++) {
                 if (mMyId.equals(players.get(p).getParticipantId()) && gameResults.get(p) == 0) {
                     gameResults.set(p, 1); //indicates won game
-                    Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
                     mMsgBuf[0] = 'O';
                     Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
                             mMsgBuf, mRoomId);
@@ -1193,7 +1196,6 @@ public class MapsActivity extends FragmentActivity implements
 
             }
             if (!win) {
-                Toast.makeText(getApplicationContext(), "You just lost the game.", Toast.LENGTH_LONG).show();
                 leaveRoom();
                 Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
                 finalScreen.putExtra("mode", gameMode);
@@ -1424,7 +1426,6 @@ public class MapsActivity extends FragmentActivity implements
                 checkGameOver();
             }
             else if(gameMode == 2){
-
                 int strLen = 0;
                 for(int i = 0; i < buf.length; i++){
                     if(buf[i] != 0){
@@ -1442,9 +1443,9 @@ public class MapsActivity extends FragmentActivity implements
                 numberOfKills++;
                 confirmedKill = true;
 
-                //TODO if this works, make it into an alert but only if gameOver is false
-                Toast.makeText(getApplicationContext(), theHunted.getDisplayName() +
-                        " is your new target", Toast.LENGTH_LONG).show();
+
+                String newTar =  theHunted.getDisplayName() +
+                        " is your new target";
 
                 String myName = "Error";
                 for (Participant p : players) {
@@ -1469,6 +1470,19 @@ public class MapsActivity extends FragmentActivity implements
                 kill.setVisibility(View.VISIBLE);
 
                 checkGameOver();
+
+                //TODO verify this does not assign new player if game is over
+                if(!gameOver) {
+                    new AlertDialog.Builder(MapsActivity.this) //
+                            .setTitle("New Target")
+                            .setMessage(newTar)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .setIcon(R.drawable.ic_launcher)
+                            .show();
+                }
             }
         }
 
@@ -1527,7 +1541,6 @@ public class MapsActivity extends FragmentActivity implements
             for (int p = 0; p < players.size(); p++) {
                 if (sender == players.get(p).getParticipantId() && gameResults.get(p) == 0) {
                     gameResults.set(p, 1); //indicates won game
-                    //Toast.makeText(getApplicationContext(), "Game over. You win!", Toast.LENGTH_LONG).show();
                     break;
                 }
             }
