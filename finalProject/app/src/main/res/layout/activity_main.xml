@@ -55,12 +55,4 @@
         android:layout_alignLeft="@+id/title"
         android:layout_alignStart="@+id/title" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="BIG UGLY BUTTON"
-        android:id="@+id/finalButton"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
 </RelativeLayout>

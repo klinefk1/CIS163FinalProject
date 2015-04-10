@@ -11,26 +11,14 @@ import android.widget.Button;
 
 public class MainActivity extends ActionBarActivity {
 
-    private Button endscreen, toMap;
+    private Button toMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        bountyHunter = (Button) findViewById(R.id.bountyHunter);
-//        freeForAll = (Button) findViewById(R.id.freeForAll);
-//        records = (Button) findViewById(R.id.records);
         toMap = (Button) findViewById(R.id.Start);
-        endscreen = (Button) findViewById(R.id.finalButton);
-
-        endscreen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent launchme = new Intent (MainActivity.this, ResultActivity.class);
-                startActivity (launchme);
-            }
-        });
 
         toMap.setOnClickListener(new View.OnClickListener() {
             @Override
