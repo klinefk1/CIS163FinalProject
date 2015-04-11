@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="#000000">
 
     <TextView
         android:layout_width="wrap_content"
@@ -11,15 +11,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:textStyle="bold"
-        android:textSize="40dp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Return to Opening Screen"
-        android:id="@+id/goToOpening"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:textSize="50dp"
+        android:textColor="#FF2121"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -29,7 +22,9 @@
         android:id="@+id/gamemode"
         android:layout_below="@+id/winlossmessage"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textSize="30dp"
+        android:textColor="#FF2121"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -39,7 +34,9 @@
         android:id="@+id/numkills"
         android:layout_below="@+id/gamemode"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textSize="30dp"
+        android:textColor="#FF2121"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -48,10 +45,11 @@
         android:text="Lifetime Stats"
         android:id="@+id/lifestats"
         android:textStyle="bold"
-        android:textSize="40dp"
-        android:layout_marginTop="27dp"
+        android:textSize="50dp"
+        android:layout_below="@+id/numkills"
         android:layout_centerHorizontal="true"
-        android:layout_alignTop="@+id/numkills" />
+        android:layout_marginTop="50dp"
+        android:textColor="#FF2121"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -61,7 +59,9 @@
         android:id="@+id/totalkills"
         android:layout_below="@+id/lifestats"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textSize="30dp"
+        android:textColor="#FF2121"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -70,8 +70,10 @@
         android:text="Free For All:"
         android:id="@+id/ffakills"
         android:layout_below="@+id/totalkills"
-        android:layout_alignLeft="@+id/winlossmessage"
-        android:layout_alignStart="@+id/winlossmessage" />
+        android:layout_alignLeft="@+id/lifestats"
+        android:layout_alignStart="@+id/lifestats"
+        android:textSize="30dp"
+        android:textColor="#FF2121"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -81,7 +83,9 @@
         android:id="@+id/bhkills"
         android:layout_below="@+id/ffakills"
         android:layout_alignLeft="@+id/ffakills"
-        android:layout_alignStart="@+id/ffakills" />
+        android:layout_alignStart="@+id/ffakills"
+        android:textSize="30dp"
+        android:textColor="#FF2121"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -91,7 +95,9 @@
         android:id="@+id/numwins"
         android:layout_below="@+id/bhkills"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textSize="30dp"
+        android:textColor="#FF2121"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -101,7 +107,10 @@
         android:id="@+id/ffawins"
         android:layout_below="@+id/numwins"
         android:layout_alignLeft="@+id/bhkills"
-        android:layout_alignStart="@+id/bhkills" />
+        android:layout_alignStart="@+id/bhkills"
+        android:textSize="30dp"
+        android:textColor="#FF2121"
+        />
 
     <TextView
         android:layout_width="wrap_content"
@@ -109,8 +118,20 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Bounty Hunter:"
         android:id="@+id/bhwins"
+        android:textSize="30dp"
+        android:textColor="#FF2121"
         android:layout_below="@+id/ffawins"
         android:layout_alignLeft="@+id/ffawins"
         android:layout_alignStart="@+id/ffawins" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:id="@+id/redline"
+        android:layout_below="@+id/numkills"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="23dp"
+        android:background="#FF2121"/>
 
 </RelativeLayout>
