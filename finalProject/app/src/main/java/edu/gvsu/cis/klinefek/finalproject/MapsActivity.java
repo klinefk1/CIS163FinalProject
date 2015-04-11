@@ -616,7 +616,7 @@ public class MapsActivity extends FragmentActivity implements
 
             for(int j = 0; j < players.size(); j++) {
                 try {
-                    Thread.sleep(5000);                 //delay to allow for time for send.
+                    Thread.sleep(3000);                 //delay to allow for time for send.
                 }
                 catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
@@ -991,7 +991,7 @@ public class MapsActivity extends FragmentActivity implements
                         messagesToSend.add(toSend);
 
                         try {
-                            Thread.sleep(5000);                 //delay to allow for time for send.
+                            Thread.sleep(3000);                 //delay to allow for time for send.
                         } catch (InterruptedException ex) {
                             Thread.currentThread().interrupt();
                         }
@@ -1059,7 +1059,7 @@ public class MapsActivity extends FragmentActivity implements
                 //Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
                 for(int j = 0; j < players.size(); j++) {
                     try {
-                        Thread.sleep(5000);                 //delay to allow for time for send.
+                        Thread.sleep(3000);                 //delay to allow for time for send.
                     }
                     catch (InterruptedException ex) {
                         Thread.currentThread().interrupt();
@@ -1176,7 +1176,7 @@ public class MapsActivity extends FragmentActivity implements
             //Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
             for(int j = 0; j < players.size(); j++) {
                 try {
-                    Thread.sleep(5000);                 //delay to allow for time for send.
+                    Thread.sleep(3000);                 //delay to allow for time for send.
                 }
                 catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
@@ -1242,7 +1242,7 @@ public class MapsActivity extends FragmentActivity implements
                     //        mMsgBuf, mRoomId);
                     for(int j = 0; j < players.size(); j++) {
                         try {
-                            Thread.sleep(5000);                 //delay to allow for time for send.
+                            Thread.sleep(3000);                 //delay to allow for time for send.
                         }
                         catch (InterruptedException ex) {
                             Thread.currentThread().interrupt();
