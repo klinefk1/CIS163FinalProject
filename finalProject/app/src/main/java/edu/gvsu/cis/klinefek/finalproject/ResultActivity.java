@@ -15,65 +15,104 @@ import android.widget.TextView;
 public class ResultActivity extends ActionBarActivity {
 
     private boolean win;            //true is win, false is lost
-    private int numberOfKills;      //number of kills in this game - to be added to total kills
-    private int mode;               //1 for free-for-all, 2 for bounty hunter
+    private int currentkills, mode, totalkills, ffakills, bhkills, totalwins, ffawins, bhwins; //1 for free-for-all, 2 for bounty hunter
     private SharedPreferences prefs;
 
-    private TextView killsInGame;
-    private TextView winLoss;
+    private TextView killsInGame, winLoss, gamemode, numkills, totkills, ffakill,bhkill, totwin, ffawin, bhwin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.finalscreen);
 
+        //sets up all of the layout text fields
+        killsInGame = (TextView) findViewById(R.id.numkills);
+        winLoss = (TextView) findViewById(R.id.winlossmessage);
+        gamemode = (TextView) findViewById(R.id.gamemode);
+        numkills = (TextView) findViewById(R.id.numkills);
+        totkills = (TextView) findViewById(R.id.totalkills);
+        ffakill = (TextView) findViewById(R.id.ffakills);
+        bhkill = (TextView) findViewById(R.id.bhkills);
+        totwin = (TextView) findViewById(R.id.numwins);
+        ffawin = (TextView) findViewById(R.id.ffawins);
+        bhwin = (TextView) findViewById(R.id.bhwins);
+
+        //gets the info from maps activity
         Intent fromMap = getIntent();
         win = fromMap.getBooleanExtra("win", false);
-        numberOfKills = fromMap.getIntExtra("kills", 0);
+        currentkills = fromMap.getIntExtra("kills", 0);
         mode = fromMap.getIntExtra("mode", 0);
 
-        killsInGame = (TextView) findViewById(R.id.kills);
-        winLoss = (TextView) findViewById(R.id.winlossmessage);
-
+        //manager to save all of the data locally
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (savedInstanceState != null) {
-            numberOfKills = savedInstanceState.getInt("kills");
+        checkNewGame();
+
+        if(mode == 1)
+        {
+            gamemode.setText("Gamemode: Free For All");
         }
         else{
-            numberOfKills = 0;
+            gamemode.setText("Gamemode: Bounty Hunter");
         }
 
+        //changes text based of if you won or lost the game played
         if(win) {
             winLoss.setText("You win!");
+            totalwins++; //you won so you get +1 to the total wins
+            totwin.setText("Total Wins: "+totalwins);
         }
         else{
             winLoss.setText("You lose!");
+            totwin.setText("Total Wins: "+totalwins);
         }
-        killsInGame.setText(Integer.toString(numberOfKills));
+
+        //sets text to current games wins
+        killsInGame.setText("Kills: "+ Integer.toString(currentkills));
+        totkills.setText(totalkills+"");
         //TODO store variables representing total wins for each mode, total losses for each mode, and lifetime kills
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        numberOfKills= prefs.getInt("kills", 0);
-        killsInGame.setText(numberOfKills+"");
+        totalkills= prefs.getInt("totalkills", 0);
+        currentkills = prefs.getInt("currentkills", 1);
+        totalwins = prefs.getInt("totalwins", 2);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         SharedPreferences.Editor ped = prefs.edit();
-        ped.putInt ("kills", numberOfKills);
+        ped.putInt ("totalkills", totalkills);
+        ped.putInt("currentkills", currentkills);
+        ped.putInt("totalwins", totalwins);
         ped.commit();
+    }
+
+    public void checkNewGame()
+    {
+        if (prefs.contains("totalkills")) {
+            totalkills = prefs.getInt("totalkills", 0)+currentkills;
+        }
+        else{
+            totalkills = currentkills;
+        }
+        if(prefs.contains("totalwins"))
+        {
+            totalwins = prefs.getInt("totalwins", 0);
+        }
+        else{
+            totalwins = 0;
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         /* outState is the name of the incoming parameter */
-        outState.putInt("kills", numberOfKills);
+        outState.putInt("totalkills", totalkills);
     }
 
     @Override
