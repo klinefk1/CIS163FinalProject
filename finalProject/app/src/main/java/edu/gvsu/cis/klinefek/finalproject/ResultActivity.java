@@ -18,7 +18,7 @@ public class ResultActivity extends ActionBarActivity {
     private int currentkills, mode, totalkills, ffakills, bhkills, totalwins, ffawins, bhwins; //1 for free-for-all, 2 for bounty hunter
     private SharedPreferences prefs;
 
-    private TextView killsInGame, winLoss, gamemode, numkills, totkills, ffakill,bhkill, totwin, ffawin, bhwin;
+    private TextView killsInGame, winLoss, gamemode, totkills, ffakill,bhkill, totwin, ffawin, bhwin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +29,6 @@ public class ResultActivity extends ActionBarActivity {
         killsInGame = (TextView) findViewById(R.id.numkills);
         winLoss = (TextView) findViewById(R.id.winlossmessage);
         gamemode = (TextView) findViewById(R.id.gamemode);
-        numkills = (TextView) findViewById(R.id.numkills);
         totkills = (TextView) findViewById(R.id.totalkills);
         ffakill = (TextView) findViewById(R.id.ffakills);
         bhkill = (TextView) findViewById(R.id.bhkills);
@@ -48,12 +47,23 @@ public class ResultActivity extends ActionBarActivity {
 
         checkNewGame();
 
+        //changes things based on the game mode you played
         if(mode == 1)
         {
             gamemode.setText("Gamemode: Free For All");
+            ffakills+=currentkills;
+            if(win)
+            {
+                ffawins++;
+            }
         }
         else{
             gamemode.setText("Gamemode: Bounty Hunter");
+            bhkills+=currentkills;
+            if(win)
+            {
+                bhwins++;
+            }
         }
 
         //changes text based of if you won or lost the game played
@@ -68,9 +78,12 @@ public class ResultActivity extends ActionBarActivity {
         }
 
         //sets text to current games wins
-        killsInGame.setText("Kills: "+ Integer.toString(currentkills));
-        totkills.setText(totalkills+"");
-        //TODO store variables representing total wins for each mode, total losses for each mode, and lifetime kills
+        killsInGame.setText("Kills: "+ currentkills);
+        totkills.setText("Total Kills: "+ totalkills);
+        ffakill.setText("Free For All: "+ ffakills);
+        bhkill.setText("Bounty Hunter: "+ bhkills);
+        ffawin.setText("Free For All: "+ ffawins);
+        bhwin.setText("Bounty Hunter: "+ bhwins);
     }
 
     @Override
@@ -79,6 +92,10 @@ public class ResultActivity extends ActionBarActivity {
         totalkills= prefs.getInt("totalkills", 0);
         currentkills = prefs.getInt("currentkills", 1);
         totalwins = prefs.getInt("totalwins", 2);
+        ffawins = prefs.getInt("ffawins", 3);
+        bhwins = prefs.getInt("bhwins", 4);
+        ffakills = prefs.getInt("ffakills", 5);
+        bhkills = prefs.getInt("bhkills", 6);
     }
 
     @Override
@@ -88,6 +105,10 @@ public class ResultActivity extends ActionBarActivity {
         ped.putInt ("totalkills", totalkills);
         ped.putInt("currentkills", currentkills);
         ped.putInt("totalwins", totalwins);
+        ped.putInt("ffawins", ffawins);
+        ped.putInt("bhwins", bhwins);
+        ped.putInt("ffakills", ffakills);
+        ped.putInt("bhkills", bhkills);
         ped.commit();
     }
 
@@ -101,10 +122,38 @@ public class ResultActivity extends ActionBarActivity {
         }
         if(prefs.contains("totalwins"))
         {
-            totalwins = prefs.getInt("totalwins", 0);
+            totalwins = prefs.getInt("totalwins", 2);
         }
         else{
             totalwins = 0;
+        }
+        if(prefs.contains("ffawins"))
+        {
+            ffawins = prefs.getInt("ffawins", 3);
+        }
+        else{
+            ffawins = 0;
+        }
+        if(prefs.contains("bhwins"))
+        {
+            bhwins = prefs.getInt("bhwins", 4);
+        }
+        else{
+            bhwins = 0;
+        }
+        if(prefs.contains("ffakills"))
+        {
+            ffakills = prefs.getInt("ffakills", 5);
+        }
+        else{
+            ffakills = 0;
+        }
+        if(prefs.contains("bhkills"))
+        {
+            bhkills = prefs.getInt("bhkills", 6);
+        }
+        else{
+            bhkills = 0;
         }
     }
 
