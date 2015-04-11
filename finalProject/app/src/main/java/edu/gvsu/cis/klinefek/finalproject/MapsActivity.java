@@ -615,14 +615,15 @@ public class MapsActivity extends FragmentActivity implements
             //Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, mMsgBuf, mRoomId);
 
             for(int j = 0; j < players.size(); j++) {
-                try {
-                    Thread.sleep(3000);                 //delay to allow for time for send.
+                if(gameResults.get(j) != 2) {
+                    try {
+                        Thread.sleep(3000);                 //delay to allow for time for send.
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                            mRoomId, players.get(j).getParticipantId());
                 }
-                catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
-                        mRoomId, players.get(j).getParticipantId());
             }
 
 
@@ -1058,14 +1059,15 @@ public class MapsActivity extends FragmentActivity implements
             else if(gameMode == 1){
                 //Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
                 for(int j = 0; j < players.size(); j++) {
-                    try {
-                        Thread.sleep(3000);                 //delay to allow for time for send.
+                    if(gameResults.get(j) != 2) {
+                        try {
+                            Thread.sleep(3000);                 //delay to allow for time for send.
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        }
+                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
+                                mRoomId, players.get(j).getParticipantId());
                     }
-                    catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                    }
-                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
-                            mRoomId, players.get(j).getParticipantId());
                 }
             }
         }
@@ -1175,14 +1177,15 @@ public class MapsActivity extends FragmentActivity implements
 
             //Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
             for(int j = 0; j < players.size(); j++) {
-                try {
-                    Thread.sleep(3000);                 //delay to allow for time for send.
+                if(gameResults.get(j) != 2) {
+                    try {
+                        Thread.sleep(3000);                 //delay to allow for time for send.
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
+                            mRoomId, players.get(j).getParticipantId());
                 }
-                catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
-                        mRoomId, players.get(j).getParticipantId());
             }
         }
     }
@@ -1241,14 +1244,15 @@ public class MapsActivity extends FragmentActivity implements
                     //Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
                     //        mMsgBuf, mRoomId);
                     for(int j = 0; j < players.size(); j++) {
-                        try {
-                            Thread.sleep(3000);                 //delay to allow for time for send.
+                        if(gameResults.get(j) != 2) {
+                            try {
+                                Thread.sleep(3000);                 //delay to allow for time for send.
+                            } catch (InterruptedException ex) {
+                                Thread.currentThread().interrupt();
+                            }
+                            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                    mRoomId, players.get(j).getParticipantId());
                         }
-                        catch (InterruptedException ex) {
-                            Thread.currentThread().interrupt();
-                        }
-                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
-                                mRoomId, players.get(j).getParticipantId());
                     }
                     win = true;
                     leaveRoom();
