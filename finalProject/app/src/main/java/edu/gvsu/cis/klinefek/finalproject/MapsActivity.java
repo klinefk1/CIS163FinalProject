@@ -11,11 +11,13 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -63,7 +65,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 
 //TODO check Toast and replace with alert popups when appropriate
@@ -100,6 +104,7 @@ public class MapsActivity extends FragmentActivity implements
     private FrameLayout mapDisplay;
     private FrameLayout killDisplay;
     private RecyclerView selectPlayer;
+    private boolean sendSuccess;    //for verifying success
     private RecyclerView.Adapter selectPlayerAdapter;
     private RecyclerView.LayoutManager selectPlayerManager;
     private int numberOfKills;
@@ -605,9 +610,21 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     private void checkResponse(boolean leave){
-        if(leave){
+        if(leave) {
             mMsgBuf[0] = 'V';   //player forfeits the game
-            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, mMsgBuf, mRoomId);
+            //Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, mMsgBuf, mRoomId);
+
+            for(int j = 0; j < players.size(); j++) {
+                try {
+                    Thread.sleep(5000);                 //delay to allow for time for send.
+                }
+                catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                        mRoomId, players.get(j).getParticipantId());
+            }
+
 
             leaveRoom();
             Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
@@ -948,27 +965,73 @@ public class MapsActivity extends FragmentActivity implements
 
             //used to randomize who is supposed to kill whom in Bounty Hunter
             if(gameMode == 2) {
+                Pair<String, byte[]> toSend;    //pair of receipent, message to be sent.
+
+                //TODO should be a queue of pairs
+                final Queue<Pair<String, byte[]>> messagesToSend;  //Queue of messages
+                messagesToSend = new LinkedList<Pair<String, byte[]>>();
 
                 Collections.shuffle(Arrays.asList(players));
                 //randomizes the numbers in the array for number of people playing
 
-                for(int j = 0; j < players.size(); j++) {
+                for (int j = 0; j < players.size(); j++) {
                     final int n = players.size();
-                    if(players.get(j).getParticipantId().equals(mMyId)){
-                            theHunted = players.get((j+1) % n);
-                    }
-                    else{
-                        String toKill = players.get((j+1) % n).getParticipantId();
+                    if (players.get(j).getParticipantId().equals(mMyId)) {
+                        theHunted = players.get((j + 1) % n);
+                    } else {
+                        String toKill = players.get((j + 1) % n).getParticipantId();
                         byte[] hunted = toKill.getBytes();
 
-                        for(int k = 0; k < hunted.length; k++){
-                            message[k+2] = hunted[k];
+                        for (int k = 0; k < hunted.length; k++) {
+                            message[k + 2] = hunted[k];
                         }
 
+                        //adds the participant and message to the queue
+                        toSend = new Pair<>(players.get(j).getParticipantId(), message);
+                        messagesToSend.add(toSend);
+
+                        try {
+                            Thread.sleep(5000);                 //delay to allow for time for send.
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        }
                         Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
                                 mRoomId, players.get(j).getParticipantId());
                     }
                 }
+                ;
+
+
+//
+//                final RealTimeMultiplayer.ReliableMessageSentCallback call = new RealTimeMultiplayer.ReliableMessageSentCallback() {
+//                    @Override
+//                    public void onRealTimeMessageSent(int statusCode, int tokenId, String recipient) {
+//                        if (statusCode == RESULT_OK) {
+//                            messagesToSend.poll();
+//                        }
+//                    }
+//                };
+//
+//                while(messagesToSend.peek() != null){
+//                    if(true) {
+//                        String rec = messagesToSend.peek().first;
+//                        byte[] fromQ = messagesToSend.peek().second;
+//
+//                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, call, fromQ,
+//                                mRoomId, rec);
+//                    }
+//                    else{
+//                        //sendSuccess = false;
+//                        messagesToSend.poll();
+//                    }
+//            }
+
+
+
+                //TODO queue of paired reciepents and messages while loop
+                //send, then wait until the first has been compeleted
+                //use sentCallback (replace null)
+
                 String lookingFor = "The player you're looking for is " + theHunted.getDisplayName();
                 //this should never happen
                 String youAreTheHunted = "Everyone is after you!";
@@ -993,7 +1056,17 @@ public class MapsActivity extends FragmentActivity implements
 
             }
             else if(gameMode == 1){
-                Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
+                //Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
+                for(int j = 0; j < players.size(); j++) {
+                    try {
+                        Thread.sleep(5000);                 //delay to allow for time for send.
+                    }
+                    catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
+                            mRoomId, players.get(j).getParticipantId());
+                }
             }
         }
     }
@@ -1100,7 +1173,17 @@ public class MapsActivity extends FragmentActivity implements
             }
 
 
-            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
+            //Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mRoomId);
+            for(int j = 0; j < players.size(); j++) {
+                try {
+                    Thread.sleep(5000);                 //delay to allow for time for send.
+                }
+                catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
+                        mRoomId, players.get(j).getParticipantId());
+            }
         }
     }
 
@@ -1155,8 +1238,18 @@ public class MapsActivity extends FragmentActivity implements
                 if (mMyId.equals(players.get(p).getParticipantId()) && gameResults.get(p) == 0) {
                     gameResults.set(p, 1); //indicates won game
                     mMsgBuf[0] = 'O';
-                    Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
-                            mMsgBuf, mRoomId);
+                    //Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,
+                    //        mMsgBuf, mRoomId);
+                    for(int j = 0; j < players.size(); j++) {
+                        try {
+                            Thread.sleep(5000);                 //delay to allow for time for send.
+                        }
+                        catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        }
+                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                mRoomId, players.get(j).getParticipantId());
+                    }
                     win = true;
                     leaveRoom();
                     Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
@@ -1305,6 +1398,7 @@ public class MapsActivity extends FragmentActivity implements
             }
         }
         else if(buf[0] == 'V'){
+            //TODO assign new player to the person assigned to kill this person
             //The player left the game
             int playerIndex = 0;
             String playerName = "error";
@@ -1494,15 +1588,17 @@ public class MapsActivity extends FragmentActivity implements
             }
 
             String killed = "error";
-            for(Participant p : players){
-                if(killedId.equals(p.getParticipantId())){
-                    killed = p.getDisplayName();
+            for(int p = 0; p < players.size(); p++){
+                if(killedId.equals(players.get(p).getParticipantId())){
+                    killed = players.get(p).getDisplayName();
+                    gameResults.set(p,2); //marks player as dead
                     break;
                 }
             }
 
             otherinfo = setMarkerInfo();
             killedName = setMarkerInfo2(senderName, killed);
+
 
             mMap.addMarker(new MarkerOptions()
                     .position(geoPos)
@@ -1646,6 +1742,14 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onRealTimeMessageSent(int i, int i2, String s) {
         Log.d("Message Sent", "sent");
+
+        //TODO
+        //remove first item from queue
+        //if !empty send next message
+
+
+        sendSuccess = true;
+
 
     }
 
