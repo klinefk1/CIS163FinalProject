@@ -11,7 +11,7 @@ import android.widget.Button;
 
 public class MainActivity extends ActionBarActivity {
 
-    private Button toMap;
+    private Button toMap, statsbtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +19,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         toMap = (Button) findViewById(R.id.Start);
+        statsbtn = (Button) findViewById(R.id.stats);
 
         toMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -28,7 +29,13 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-
+        statsbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent launchMap = new Intent(MainActivity.this, ResultActivity.class);
+                startActivity(launchMap);
+            }
+        });
     }
 
     @Override

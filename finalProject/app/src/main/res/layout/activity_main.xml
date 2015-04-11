@@ -24,10 +24,10 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/Kills"
+        android:id="@+id/stats"
         android:background="#000000"
         android:textColor="#FF2121"
-        android:text="Kills"
+        android:text="Stats"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@+id/Rules"
         android:layout_toEndOf="@+id/Rules" />

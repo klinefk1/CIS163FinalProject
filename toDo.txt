@@ -1,13 +1,5 @@
 Things that need done for the final project:
 
-	-store data after game completes - I believe we had a lab about something similar to this 
-		-things could be updated (saved on system)
-			- Free-For-All Wins +1 or 
-			- Bounty Hunter Wins +1 and
-			- Also loses for each
-			- Lifetime Kills +totalKills
-		- Mike
-
 	-add at least 5 achievements (we should make these fairly easy to implement)
 		- kill all the other players in an 8 player free-for-all (serial killer?)
 		- win certain number of free-for-all matches
@@ -18,14 +10,6 @@ Things that need done for the final project:
 
 	-add instructions activity accessable from main screen
 		-Austin
-
-	-add kills/stats screen accessable from main screen
-		-use stored data talked about above
-		-Mike
-
-	-figure out what to do in the final screen (probably display 'you win' or something and button to take player back to first screen)
-		-Mike
-
 
 	-debug game logic
 		-Katherine
