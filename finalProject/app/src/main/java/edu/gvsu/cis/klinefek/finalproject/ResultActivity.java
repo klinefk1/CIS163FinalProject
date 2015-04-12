@@ -19,11 +19,14 @@ public class ResultActivity extends ActionBarActivity {
     private SharedPreferences prefs;
 
     private TextView killsInGame, winLoss, gamemode, totkills, ffakill,bhkill, totwin, ffawin, bhwin;
+    private Button reset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.finalscreen);
+
+        reset = (Button) findViewById(R.id.button);
 
         //sets up all of the layout text fields
         killsInGame = (TextView) findViewById(R.id.numkills);
@@ -77,6 +80,26 @@ public class ResultActivity extends ActionBarActivity {
             totwin.setText("Total Wins: "+totalwins);
         }
 
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentkills = 0;
+                totalkills = 0;
+                ffakills = 0;
+                bhkills = 0;
+                totalwins = 0;
+                ffawins = 0;
+                bhwins = 0;
+                killsInGame.setText("Kills: "+ currentkills);
+                totkills.setText("Total Kills: "+ totalkills);
+                ffakill.setText("Free For All: "+ ffakills);
+                bhkill.setText("Bounty Hunter: "+ bhkills);
+                totwin.setText("Total Wins: "+totalwins);
+                ffawin.setText("Free For All: "+ ffawins);
+                bhwin.setText("Bounty Hunter: "+ bhwins);
+            }
+        });
+
         //sets text to current games wins
         killsInGame.setText("Kills: "+ currentkills);
         totkills.setText("Total Kills: "+ totalkills);
@@ -90,12 +113,12 @@ public class ResultActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         totalkills= prefs.getInt("totalkills", 0);
-        currentkills = prefs.getInt("currentkills", 1);
-        totalwins = prefs.getInt("totalwins", 2);
-        ffawins = prefs.getInt("ffawins", 3);
-        bhwins = prefs.getInt("bhwins", 4);
-        ffakills = prefs.getInt("ffakills", 5);
-        bhkills = prefs.getInt("bhkills", 6);
+        currentkills = prefs.getInt("currentkills", 0);
+        totalwins = prefs.getInt("totalwins", 0);
+        ffawins = prefs.getInt("ffawins", 0);
+        bhwins = prefs.getInt("bhwins", 0);
+        ffakills = prefs.getInt("ffakills", 0);
+        bhkills = prefs.getInt("bhkills", 0);
     }
 
     @Override
@@ -122,35 +145,35 @@ public class ResultActivity extends ActionBarActivity {
         }
         if(prefs.contains("totalwins"))
         {
-            totalwins = prefs.getInt("totalwins", 2);
+            totalwins = prefs.getInt("totalwins", 0);
         }
         else{
             totalwins = 0;
         }
         if(prefs.contains("ffawins"))
         {
-            ffawins = prefs.getInt("ffawins", 3);
+            ffawins = prefs.getInt("ffawins", 0);
         }
         else{
             ffawins = 0;
         }
         if(prefs.contains("bhwins"))
         {
-            bhwins = prefs.getInt("bhwins", 4);
+            bhwins = prefs.getInt("bhwins", 0);
         }
         else{
             bhwins = 0;
         }
         if(prefs.contains("ffakills"))
         {
-            ffakills = prefs.getInt("ffakills", 5);
+            ffakills = prefs.getInt("ffakills", 0);
         }
         else{
             ffakills = 0;
         }
         if(prefs.contains("bhkills"))
         {
-            bhkills = prefs.getInt("bhkills", 6);
+            bhkills = prefs.getInt("bhkills", 0);
         }
         else{
             bhkills = 0;
