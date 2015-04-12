@@ -1758,6 +1758,8 @@ public class MapsActivity extends FragmentActivity implements
 
     }
 
+    //A terrible solution to the message delay problem that does allow me to
+    //test the rest of the game logic.
     public class SendMessagesToAll extends AsyncTask<byte[], Void, Void> {
         //loads the poster image of a given TV show or movie and sets it
         //in the imageView on the UI
