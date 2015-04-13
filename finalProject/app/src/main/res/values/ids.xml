@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    
+
     <!--Strings for achievements-->
-    <string name="app_id">793245498264</string>
     <string name="achievement_first_kill">CgkImPf2iIsXEAIQAQ</string>
     <string name="achievement_no_going_back">CgkImPf2iIsXEAIQAg</string>
     <string name="achievement_youre_getting_the_hang_of_it">CgkImPf2iIsXEAIQAw</string>
