@@ -1231,38 +1231,37 @@ public class MapsActivity extends FragmentActivity implements
                 if (mMyId.equals(players.get(p).getParticipantId()) && gameResults.get(p) == 0) {
                     gameResults.set(p, 1); //indicates won game
                     mMsgBuf[0] = 'O';
-                    break;
-                }
 
-                Pair<String, byte[]> toSend;
-                messagesToSend.clear();
 
-                for (int i = 0; i < players.size(); i++) {
-                    if (gameResults.get(i) != 2) {
-                        toSend = new Pair<>(players.get(i).getParticipantId(), mMsgBuf);
-                        messagesToSend.add(toSend);
+                    Pair<String, byte[]> toSend;
+                    messagesToSend.clear();
+
+                    for (int i = 0; i < players.size(); i++) {
+                        if (gameResults.get(i) != 2) {
+                            toSend = new Pair<>(players.get(i).getParticipantId(), mMsgBuf);
+                            messagesToSend.add(toSend);
+                        }
                     }
+
+                    if (messagesToSend.size() > 0) {
+                        String rec = messagesToSend.peek().first;
+                        byte[] fromQ = messagesToSend.peek().second;
+
+                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
+                                mRoomId, rec);
+
+                        messagesToSend.poll();
+                    }
+
+                    win = true;
+                    Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+                    finalScreen.putExtra("mode", gameMode);
+                    finalScreen.putExtra("win", true);
+                    finalScreen.putExtra("kills", numberOfKills);
+                    leaveRoom();
+                    startActivity(finalScreen);
+                    finish();
                 }
-
-                if (messagesToSend.size() > 0) {
-                    String rec = messagesToSend.peek().first;
-                    byte[] fromQ = messagesToSend.peek().second;
-
-                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
-                            mRoomId, rec);
-
-                    messagesToSend.poll();
-                }
-
-                win = true;
-                leaveRoom();
-                Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-                finalScreen.putExtra("mode", gameMode);
-                finalScreen.putExtra("win", true);
-                finalScreen.putExtra("kills", numberOfKills);
-                startActivity(finalScreen);
-                finish();
-
             }
             if (!win) {
                 leaveRoom();
