@@ -962,108 +962,6 @@ public class MapsActivity extends FragmentActivity implements
         Log.d(TAG, "Room ID: " + mRoomId);
         Log.d(TAG, "My ID " + mMyId);
         Log.d(TAG, "<< CONNECTED TO ROOM>>");
-
-//        //sets game mode for all players
-////        if (gameMode != 0) {
-////
-////            byte[] message = new byte[25];
-////            message[0] = 'X';
-////            message[1] = (byte) gameMode;
-////
-////            //used to randomize who is supposed to kill whom in Bounty Hunter
-////            if (gameMode == 2) {
-////                Pair<String, byte[]> toSend;    //pair of receipent, message to be sent.
-////
-////                //TODO should be a queue of pairs
-////                messagesToSend.clear();
-////
-////                Collections.shuffle(Arrays.asList(players));
-////                //randomizes the numbers in the array for number of people playing
-////
-////                for (int j = 0; j < players.size(); j++) {
-////                    final int n = players.size();
-////                    if (players.get(j).getParticipantId().equals(mMyId)) {
-////                        theHunted = players.get((j + 1) % n);
-////                    } else {
-////                        String toKill = players.get((j + 1) % n).getParticipantId();
-////                        byte[] hunted = toKill.getBytes();
-////
-////                        for (int k = 0; k < hunted.length; k++) {
-////                            message[k + 2] = hunted[k];
-////                        }
-////
-////                        //adds the participant and message to the queue
-////                        toSend = new Pair<>(players.get(j).getParticipantId(), message);
-////                        messagesToSend.add(toSend);
-////
-////                    }
-////                }
-////                ;
-////
-////
-////
-////
-////                if (messagesToSend.size() > 0){
-////                        String rec = messagesToSend.peek().first;
-////                        byte[] fromQ = messagesToSend.peek().second;
-////
-////                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
-////                                mRoomId, rec);
-////
-////                        messagesToSend.poll();
-////
-////               }
-//
-//
-//                //TODO queue of paired reciepents and messages while loop
-//                //send, then wait until the first has been compeleted
-//                //use sentCallback (replace null)
-//
-//                String lookingFor = "The player you're looking for is " + theHunted.getDisplayName();
-//                //this should never happen
-//                String youAreTheHunted = "Everyone is after you!";
-//
-//                String message2;
-//                if (mMyId.equals(theHunted.getParticipantId())) {
-//                    message2 = youAreTheHunted;
-//                } else {
-//                    message2 = lookingFor;
-//                }
-//
-//                new AlertDialog.Builder(MapsActivity.this) //
-//                        .setTitle("Bounty Hunter")
-//                        .setMessage(message2)
-//                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int which) {
-//                            }
-//                        })
-//                        .setIcon(R.drawable.ic_launcher)
-//                        .show();
-//
-//            } else if (gameMode == 1) {
-//
-//                Pair<String, byte[]> toSend;    //pair of receipent, message to be sent.
-//                messagesToSend.clear();
-//
-//                for(int i = 0; i < players.size(); i++){
-//                    if(gameResults.get(i) != 2) {
-//                        toSend = new Pair<>(players.get(i).getParticipantId(), message);
-//                        messagesToSend.add(toSend);
-//                    }
-//                }
-//
-//                if (messagesToSend.size() > 0){
-//                    String rec = messagesToSend.peek().first;
-//                    byte[] fromQ = messagesToSend.peek().second;
-//
-//                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
-//                            mRoomId, rec);
-//
-//                    messagesToSend.poll();
-//
-//                }
-//            }
-//        }
     }
 
     @Override
@@ -1124,8 +1022,7 @@ public class MapsActivity extends FragmentActivity implements
                 //used to randomize who is supposed to kill whom in Bounty Hunter
                 if (gameMode == 2) {
                     Pair<String, byte[]> toSend;    //pair of receipent, message to be sent.
-
-                    //TODO should be a queue of pairs
+                    //TODO test this
                     messagesToSend.clear();
 
                     Collections.shuffle(Arrays.asList(players));
@@ -1150,9 +1047,6 @@ public class MapsActivity extends FragmentActivity implements
 
                         }
                     }
-                    ;
-
-
                     if (messagesToSend.size() > 0) {
                         String rec = messagesToSend.peek().first;
                         byte[] fromQ = messagesToSend.peek().second;
@@ -1161,13 +1055,8 @@ public class MapsActivity extends FragmentActivity implements
                                 mRoomId, rec);
 
                         messagesToSend.poll();
-
                     }
 
-
-                    //TODO queue of paired reciepents and messages while loop
-                    //send, then wait until the first has been compeleted
-                    //use sentCallback (replace null)
 
                     String lookingFor = "The player you're looking for is " + theHunted.getDisplayName();
                     //this should never happen
@@ -1190,7 +1079,8 @@ public class MapsActivity extends FragmentActivity implements
                             .setIcon(R.drawable.ic_launcher)
                             .show();
 
-                } else if (gameMode == 1) {
+                }
+                else if (gameMode == 1) {
 
                     Pair<String, byte[]> toSend;    //pair of receipent, message to be sent.
                     messagesToSend.clear();
@@ -1214,7 +1104,7 @@ public class MapsActivity extends FragmentActivity implements
                     }
                 }
             }
-        }
+    }
 
 
     //sets a marker at the location of a kill.
