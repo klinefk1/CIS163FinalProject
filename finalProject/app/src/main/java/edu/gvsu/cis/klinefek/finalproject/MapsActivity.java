@@ -1231,37 +1231,38 @@ public class MapsActivity extends FragmentActivity implements
                 if (mMyId.equals(players.get(p).getParticipantId()) && gameResults.get(p) == 0) {
                     gameResults.set(p, 1); //indicates won game
                     mMsgBuf[0] = 'O';
-
-
-                    Pair<String, byte[]> toSend;
-                    messagesToSend.clear();
-
-                    for(int i = 0; i < players.size(); i++){
-                        if(gameResults.get(i) != 2) {
-                            toSend = new Pair<>(players.get(i).getParticipantId(), mMsgBuf);
-                            messagesToSend.add(toSend);
-                        }
-                    }
-
-                    if (messagesToSend.size() > 0) {
-                        String rec = messagesToSend.peek().first;
-                        byte[] fromQ = messagesToSend.peek().second;
-
-                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
-                                mRoomId, rec);
-
-                        messagesToSend.poll();
-                    }
-
-                    win = true;
-                    leaveRoom();
-                    Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-                    finalScreen.putExtra("mode", gameMode);
-                    finalScreen.putExtra("win", true);
-                    finalScreen.putExtra("kills", numberOfKills);
-                    startActivity(finalScreen);
-                    finish();
+                    break;
                 }
+
+                Pair<String, byte[]> toSend;
+                messagesToSend.clear();
+
+                for (int i = 0; i < players.size(); i++) {
+                    if (gameResults.get(i) != 2) {
+                        toSend = new Pair<>(players.get(i).getParticipantId(), mMsgBuf);
+                        messagesToSend.add(toSend);
+                    }
+                }
+
+                if (messagesToSend.size() > 0) {
+                    String rec = messagesToSend.peek().first;
+                    byte[] fromQ = messagesToSend.peek().second;
+
+                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
+                            mRoomId, rec);
+
+                    messagesToSend.poll();
+                }
+
+                win = true;
+                leaveRoom();
+                Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+                finalScreen.putExtra("mode", gameMode);
+                finalScreen.putExtra("win", true);
+                finalScreen.putExtra("kills", numberOfKills);
+                startActivity(finalScreen);
+                finish();
+
             }
             if (!win) {
                 leaveRoom();
@@ -1272,7 +1273,8 @@ public class MapsActivity extends FragmentActivity implements
                 startActivity(finalScreen);
                 finish();
             }
-        } else {
+        }
+        else {
             int playersLeft = numRemaining - 1;
             Toast.makeText(getApplicationContext(), playersLeft + " players left  to kill.", Toast.LENGTH_LONG).show();
         }
