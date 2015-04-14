@@ -361,6 +361,9 @@ public class MapsActivity extends FragmentActivity implements
                         });
                     } else {
                         //You are the hunted...you can't kill
+                        //TODO toast check this
+                        Toast.makeText(getApplicationContext(), "You are dead.  You can't kill people",
+                                Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -1015,9 +1018,6 @@ public class MapsActivity extends FragmentActivity implements
             //sets game mode for all players
             if (gameMode != 0) {
 
-                byte[] message = new byte[25];
-                message[0] = 'X';
-                message[1] = (byte) gameMode;
 
                 //used to randomize who is supposed to kill whom in Bounty Hunter
                 if (gameMode == 2) {
@@ -1027,13 +1027,17 @@ public class MapsActivity extends FragmentActivity implements
 
                     Collections.shuffle(Arrays.asList(players));
                     //randomizes the numbers in the array for number of people playing
+                    final int n = players.size();
 
                     for (int j = 0; j < players.size(); j++) {
-                        final int n = players.size();
                         if (players.get(j).getParticipantId().equals(mMyId)) {
                             theHunted = players.get((j + 1) % n);
                         }
                         else {
+                            byte[] message = new byte[25];
+                            message[0] = 'X';
+                            message[1] = (byte) gameMode;
+
                             String toKill = players.get((j + 1) % n).getParticipantId();
                             byte[] hunted = toKill.getBytes();
 
@@ -1044,7 +1048,6 @@ public class MapsActivity extends FragmentActivity implements
                             //adds the participant and message to the queue
                             toSend = new Pair<>(players.get(j).getParticipantId(), message);
                             messagesToSend.add(toSend);
-
                         }
                     }
                     if (messagesToSend.size() > 0) {
@@ -1081,6 +1084,10 @@ public class MapsActivity extends FragmentActivity implements
 
                 }
                 else if (gameMode == 1) {
+
+                    byte[] message = new byte[25];
+                    message[0] = 'X';
+                    message[1] = (byte) gameMode;
 
                     Pair<String, byte[]> toSend;    //pair of receipent, message to be sent.
                     messagesToSend.clear();
@@ -1791,8 +1798,7 @@ public class MapsActivity extends FragmentActivity implements
 
 
     public class ImageSetTask extends AsyncTask<String, Void, Bitmap> {
-        //loads the poster image of a given TV show or movie and sets it
-        //in the imageView on the UI
+        //Loads image from players Google+ account
 
         @Override
         protected Bitmap doInBackground(String... params) {
