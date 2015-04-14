@@ -361,7 +361,6 @@ public class MapsActivity extends FragmentActivity implements
                         });
                     } else {
                         //You are the hunted...you can't kill
-                        //TODO toast check this
                         Toast.makeText(getApplicationContext(), "You are dead.  You can't kill people",
                                 Toast.LENGTH_LONG).show();
                     }
@@ -630,19 +629,19 @@ public class MapsActivity extends FragmentActivity implements
                 String rec = messagesToSend.peek().first;
                 byte[] fromQ = messagesToSend.peek().second;
 
+                messagesToSend.poll();
+
                 Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
                         mRoomId, rec);
-
-                messagesToSend.poll();
             }
 
 
 
-            leaveRoom();
             Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
             finalScreen.putExtra("mode", gameMode);
             finalScreen.putExtra("win", false);
             finalScreen.putExtra("kills", numberOfKills);
+            leaveRoom();
             startActivity(finalScreen);
             finish();
         }
@@ -1022,7 +1021,6 @@ public class MapsActivity extends FragmentActivity implements
                 //used to randomize who is supposed to kill whom in Bounty Hunter
                 if (gameMode == 2) {
                     Pair<String, byte[]> toSend;    //pair of receipent, message to be sent.
-                    //TODO test this
                     messagesToSend.clear();
 
                     Collections.shuffle(Arrays.asList(players));
@@ -1054,10 +1052,10 @@ public class MapsActivity extends FragmentActivity implements
                         String rec = messagesToSend.peek().first;
                         byte[] fromQ = messagesToSend.peek().second;
 
+                        messagesToSend.poll();
+
                         Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
                                 mRoomId, rec);
-
-                        messagesToSend.poll();
                     }
 
 
@@ -1103,11 +1101,10 @@ public class MapsActivity extends FragmentActivity implements
                         String rec = messagesToSend.peek().first;
                         byte[] fromQ = messagesToSend.peek().second;
 
-                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
-                                mRoomId, rec);
-
                         messagesToSend.poll();
 
+                        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
+                                mRoomId, rec);
                     }
                 }
             }
@@ -1177,10 +1174,10 @@ public class MapsActivity extends FragmentActivity implements
                 String rec = messagesToSend.peek().first;
                 byte[] fromQ = messagesToSend.peek().second;
 
+                messagesToSend.poll();
+
                 Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
                         mRoomId, rec);
-
-                messagesToSend.poll();
 
             }
 
@@ -1254,10 +1251,10 @@ public class MapsActivity extends FragmentActivity implements
                         String rec = messagesToSend.peek().first;
                         byte[] fromQ = messagesToSend.peek().second;
 
+                        messagesToSend.poll();
+
                         Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
                                 mRoomId, rec);
-
-                        messagesToSend.poll();
                     }
 
                     win = true;
@@ -1271,11 +1268,11 @@ public class MapsActivity extends FragmentActivity implements
                 }
             }
             if (!win) {
-                leaveRoom();
                 Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
                 finalScreen.putExtra("mode", gameMode);
                 finalScreen.putExtra("win", false);
                 finalScreen.putExtra("kills", numberOfKills);
+                leaveRoom();
                 startActivity(finalScreen);
                 finish();
             }
@@ -1334,12 +1331,12 @@ public class MapsActivity extends FragmentActivity implements
                                 mMsgBuf[0] = 'A';
                                 Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
                                         mRoomId, sendTo);
-                                leaveRoom();
                                 //intent to final screen
                                 Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
                                 finalScreen.putExtra("mode", gameMode);
                                 finalScreen.putExtra("win", false);
                                 finalScreen.putExtra("kills", numberOfKills);
+                                leaveRoom();
                                 startActivity(finalScreen);
                                 finish();
                             }
@@ -1385,12 +1382,12 @@ public class MapsActivity extends FragmentActivity implements
 
                                 Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
                                         mRoomId, sendTo);
-                                leaveRoom();
                                 //intent to final screen
                                 Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
                                 finalScreen.putExtra("mode", gameMode);
                                 finalScreen.putExtra("win", false);
                                 finalScreen.putExtra("kills", numberOfKills);
+                                leaveRoom();
                                 startActivity(finalScreen);
                                 finish();
                             }
@@ -1406,7 +1403,6 @@ public class MapsActivity extends FragmentActivity implements
                         .show();
             }
         } else if (buf[0] == 'V') {
-            //TODO assign new player to the person assigned to kill this person
             //The player left the game
             if(gameMode == 1) {
                 int playerIndex = 0;
@@ -1508,7 +1504,8 @@ public class MapsActivity extends FragmentActivity implements
             }
 
 
-        } else if (buf[0] == 'A') {             //receiving message that kill is accepted
+        }
+        else if (buf[0] == 'A') {             //receiving message that kill is accepted
             if (gameMode == 1) {
                 String senderName = "Anonymous";
                 for (Participant p : players) {
@@ -1544,7 +1541,8 @@ public class MapsActivity extends FragmentActivity implements
                 kill.setVisibility(View.VISIBLE);
 
                 checkGameOver();
-            } else if (gameMode == 2) {
+            }
+            else if (gameMode == 2) {
                 int strLen = 0;
                 for (int i = 0; i < buf.length; i++) {
                     if (buf[i] != 0) {
@@ -1784,15 +1782,17 @@ public class MapsActivity extends FragmentActivity implements
     public void onRealTimeMessageSent(int i, int i2, String s) {
         Log.d("Message Sent", "sent");
 
+        //TODO fix messages everywhere except original one
+
         //Sends messages to all in queue
         if(messagesToSend.size() > 0){
             String rec = messagesToSend.peek().first;
             byte[] fromQ = messagesToSend.peek().second;
 
+            messagesToSend.poll();
+
             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
                     mRoomId, rec);
-
-            messagesToSend.poll();
         }
     }
 
