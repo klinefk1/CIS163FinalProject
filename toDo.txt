@@ -9,4 +9,5 @@ Things that still need done:
 		-Full description (up to 4000 char)
 
 
-	I reread the thing about publishing and it will not allow it without at least 5 achievements, so let's pick the easiest 5 to implement and do that.  We can add more if we want later.
+	I reread the thing about publishing and it will not allow it without at least 5 achievements, so let's pick the easiest 5 to implement and do that.  We can add more if we want later.  I can try to do this and test it tonight/tomorrow morning.  Can we meet at 
+	2pm again and publish then?
