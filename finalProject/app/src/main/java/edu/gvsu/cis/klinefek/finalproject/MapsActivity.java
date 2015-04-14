@@ -81,7 +81,6 @@ public class MapsActivity extends FragmentActivity implements
     private static final String TAG = "Assassin";
     private static final String KEY_IN_RESOLUTION = "is_in_resolution";
     private Marker myMarker;
-    private boolean confirmedKill = false;
     private TextView kill;
     private TextView returnToMap;
     private TextView selectkill;
@@ -98,10 +97,10 @@ public class MapsActivity extends FragmentActivity implements
     private boolean gameStarted;
     private Participant theHunted;  //target player in bounty hunter
     private boolean gameOver;
+    private boolean win;            //whether or not you won the game
     private FrameLayout mapDisplay;
     private FrameLayout killDisplay;
     private RecyclerView selectPlayer;
-    private boolean sendSuccess;    //for verifying success
     private RecyclerView.Adapter selectPlayerAdapter;
     private RecyclerView.LayoutManager selectPlayerManager;
     private int numberOfKills;
@@ -209,6 +208,7 @@ public class MapsActivity extends FragmentActivity implements
 
 
         numberOfKills = 0;
+        win = false;
 
         selectPlayer = (RecyclerView) findViewById(R.id.playerToKill);
         selectPlayerManager = new LinearLayoutManager(getApplicationContext());
@@ -296,7 +296,7 @@ public class MapsActivity extends FragmentActivity implements
                                 //sends message to that player to either accept or deny the kill
                                 if (playerKilled != null) {
                                     mMsgBuf[0] = 'K';
-                                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, MapsActivity.this, mMsgBuf,
                                             mRoomId, playerKilled.getParticipantId());
                                 } else
                                     //This should never happen
@@ -355,7 +355,7 @@ public class MapsActivity extends FragmentActivity implements
                             @Override
                             public void onClick(View v) {
                                 mMsgBuf[0] = 'K';
-                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, MapsActivity.this, mMsgBuf,
                                         mRoomId, theHunted.getParticipantId());
                             }
                         });
@@ -631,19 +631,21 @@ public class MapsActivity extends FragmentActivity implements
 
                 messagesToSend.poll();
 
+                gameOver = true;
+
                 Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
                         mRoomId, rec);
             }
 
 
 
-            Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-            finalScreen.putExtra("mode", gameMode);
-            finalScreen.putExtra("win", false);
-            finalScreen.putExtra("kills", numberOfKills);
-            leaveRoom();
-            startActivity(finalScreen);
-            finish();
+//            Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+//            finalScreen.putExtra("mode", gameMode);
+//            finalScreen.putExtra("win", false);
+//            finalScreen.putExtra("kills", numberOfKills);
+//            leaveRoom();
+//            startActivity(finalScreen);
+//            finish();
         }
     }
 
@@ -1113,7 +1115,6 @@ public class MapsActivity extends FragmentActivity implements
 
     //sets a marker at the location of a kill.
     private void setKillMarker(String killer, String killed, String killedId) {
-        if (confirmedKill) {
             LatLng geoPos = new LatLng(myMarker.getPosition().latitude, myMarker.getPosition().longitude);
             killLocations.add(geoPos);
             //this is used to store each kill location so that they can be
@@ -1141,7 +1142,6 @@ public class MapsActivity extends FragmentActivity implements
                     .title(killedName)
                     .snippet(otherinfo)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.explosionicon)));
-            confirmedKill = false;
 
 
             byte[] message = new byte[200];
@@ -1180,8 +1180,6 @@ public class MapsActivity extends FragmentActivity implements
                         mRoomId, rec);
 
             }
-
-        }
     }
 
 
@@ -1229,7 +1227,6 @@ public class MapsActivity extends FragmentActivity implements
         if (numRemaining <= 1) {
             //game is over
             //return intent to final screen
-            boolean win = false;
             gameOver = true;
             for (int p = 0; p < players.size(); p++) {
                 if (mMyId.equals(players.get(p).getParticipantId()) && gameResults.get(p) == 0) {
@@ -1258,16 +1255,17 @@ public class MapsActivity extends FragmentActivity implements
                     }
 
                     win = true;
-                    Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-                    finalScreen.putExtra("mode", gameMode);
-                    finalScreen.putExtra("win", true);
-                    finalScreen.putExtra("kills", numberOfKills);
-                    leaveRoom();
-                    startActivity(finalScreen);
-                    finish();
+//                    Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+//                    finalScreen.putExtra("mode", gameMode);
+//                    finalScreen.putExtra("win", true);
+//                    finalScreen.putExtra("kills", numberOfKills);
+//                    leaveRoom();
+//                    startActivity(finalScreen);
+//                    finish();
                 }
             }
             if (!win) {
+                //Leave this
                 Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
                 finalScreen.putExtra("mode", gameMode);
                 finalScreen.putExtra("win", false);
@@ -1327,24 +1325,24 @@ public class MapsActivity extends FragmentActivity implements
                                         gameResults.set(p, 2); //indicates lost game
                                     }
                                 }
-
+                                gameOver = true;
                                 mMsgBuf[0] = 'A';
-                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, MapsActivity.this, mMsgBuf,
                                         mRoomId, sendTo);
                                 //intent to final screen
-                                Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-                                finalScreen.putExtra("mode", gameMode);
-                                finalScreen.putExtra("win", false);
-                                finalScreen.putExtra("kills", numberOfKills);
-                                leaveRoom();
-                                startActivity(finalScreen);
-                                finish();
+//                                Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+//                                finalScreen.putExtra("mode", gameMode);
+//                                finalScreen.putExtra("win", false);
+//                                finalScreen.putExtra("kills", numberOfKills);
+//                                leaveRoom();
+//                                startActivity(finalScreen);
+//                                finish();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 mMsgBuf[0] = 'D';
-                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, MapsActivity.this, mMsgBuf,
                                         mRoomId, sendTo);
                             }
                         })
@@ -1379,23 +1377,23 @@ public class MapsActivity extends FragmentActivity implements
                                 for (int i = 0; i < newTarget.length; i++) {
                                     message[i + 1] = newTarget[i];
                                 }
-
-                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
+                                gameOver = true;
+                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, MapsActivity.this, message,
                                         mRoomId, sendTo);
                                 //intent to final screen
                                 Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-                                finalScreen.putExtra("mode", gameMode);
-                                finalScreen.putExtra("win", false);
-                                finalScreen.putExtra("kills", numberOfKills);
-                                leaveRoom();
-                                startActivity(finalScreen);
-                                finish();
+//                                finalScreen.putExtra("mode", gameMode);
+//                                finalScreen.putExtra("win", false);
+//                                finalScreen.putExtra("kills", numberOfKills);
+//                                leaveRoom();
+//                                startActivity(finalScreen);
+//                                finish();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 mMsgBuf[0] = 'D';
-                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf,
+                                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, MapsActivity.this, mMsgBuf,
                                         mRoomId, sendTo);
                             }
                         })
@@ -1514,7 +1512,6 @@ public class MapsActivity extends FragmentActivity implements
                     }
                 }
                 numberOfKills++;
-                confirmedKill = true;
                 Toast.makeText(getApplicationContext(), senderName + " was killed.", Toast.LENGTH_LONG).show();
 
 
@@ -1558,7 +1555,6 @@ public class MapsActivity extends FragmentActivity implements
                 }
 
                 numberOfKills++;
-                confirmedKill = true;
 
 
                 String newTar = theHunted.getDisplayName() +
@@ -1603,7 +1599,8 @@ public class MapsActivity extends FragmentActivity implements
         } else if (buf[0] == 'D') {             //receiving message that kill is declined
             Toast.makeText(getApplicationContext(), "The player did not confirm the kill.",
                     Toast.LENGTH_LONG).show();
-        } else if (buf[0] == 'S') {             //message received to all players set new kill marker
+        }
+        else if (buf[0] == 'S') {             //message received to all players set new kill marker
             double lat = toDouble(Arrays.copyOfRange(buf, 1, 9));
             double lon = toDouble(Arrays.copyOfRange(buf, 9, 17));
 
@@ -1793,6 +1790,17 @@ public class MapsActivity extends FragmentActivity implements
 
             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, this, fromQ,
                     mRoomId, rec);
+        }
+
+        if(gameOver && messagesToSend.size() < 1){
+            //TODO put intent here
+            Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
+            finalScreen.putExtra("mode", gameMode);
+            finalScreen.putExtra("win", win);
+            finalScreen.putExtra("kills", numberOfKills);
+            leaveRoom();
+            startActivity(finalScreen);
+            finish();
         }
     }
 
