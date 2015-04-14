@@ -9,4 +9,4 @@ Things that still need done:
 		-Full description (up to 4000 char)
 
 
-	I believe that is all...we don't need to do the achievements now.  We can do that later if we want to, but let's focus on getting this stuff together for now.
+	I reread the thing about publishing and it will not allow it without at least 5 achievements, so let's pick the easiest 5 to implement and do that.  We can add more if we want later.
