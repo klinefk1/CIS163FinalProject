@@ -2,6 +2,7 @@ package edu.gvsu.cis.klinefek.finalproject;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -19,14 +21,13 @@ public class ResultActivity extends ActionBarActivity {
     private SharedPreferences prefs;
 
     private TextView killsInGame, winLoss, gamemode, totkills, ffakill,bhkill, totwin, ffawin, bhwin;
-    private Button reset;
+    private ImageView redLine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.finalscreen);
 
-        reset = (Button) findViewById(R.id.button);
 
         //sets up all of the layout text fields
         killsInGame = (TextView) findViewById(R.id.numkills);
@@ -38,6 +39,8 @@ public class ResultActivity extends ActionBarActivity {
         totwin = (TextView) findViewById(R.id.numwins);
         ffawin = (TextView) findViewById(R.id.ffawins);
         bhwin = (TextView) findViewById(R.id.bhwins);
+
+        redLine = (ImageView) findViewById(R.id.redline);
 
         //gets the info from maps activity
         Intent fromMap = getIntent();
@@ -59,7 +62,7 @@ public class ResultActivity extends ActionBarActivity {
         //changes things based on the game mode you played
         if(mode == 1)
         {
-            gamemode.setText("Gamemode: Free For All");
+            gamemode.setText("Game Mode: Free For All");
             ffakills+=currentkills;
             if(win)
             {
@@ -67,7 +70,7 @@ public class ResultActivity extends ActionBarActivity {
             }
         }
         else if(mode == 2){
-            gamemode.setText("Gamemode: Bounty Hunter");
+            gamemode.setText("Game Mode: Bounty Hunter");
             bhkills+=currentkills;
             if(win)
             {
@@ -76,8 +79,9 @@ public class ResultActivity extends ActionBarActivity {
         }
         else{
             gamemode.setVisibility(View.GONE);
-            winLoss.setText("Last Game Kills:");
-
+            winLoss.setVisibility(View.GONE);
+            redLine.setVisibility(View.GONE);
+            killsInGame.setVisibility(View.GONE);
         }
 
         //changes text based of if you won or lost the game played
@@ -90,26 +94,6 @@ public class ResultActivity extends ActionBarActivity {
             winLoss.setText("You lose!");
             totwin.setText("Total Wins: "+totalwins);
         }
-
-        reset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                currentkills = 0;
-                totalkills = 0;
-                ffakills = 0;
-                bhkills = 0;
-                totalwins = 0;
-                ffawins = 0;
-                bhwins = 0;
-                killsInGame.setText("Kills: "+ currentkills);
-                totkills.setText("Total Kills: "+ totalkills);
-                ffakill.setText("Free For All: "+ ffakills);
-                bhkill.setText("Bounty Hunter: "+ bhkills);
-                totwin.setText("Total Wins: "+totalwins);
-                ffawin.setText("Free For All: "+ ffawins);
-                bhwin.setText("Bounty Hunter: "+ bhwins);
-            }
-        });
 
         totalkills+=currentkills;
         //sets text to current games wins
