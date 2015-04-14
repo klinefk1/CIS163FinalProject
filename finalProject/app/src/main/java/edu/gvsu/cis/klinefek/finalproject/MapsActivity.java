@@ -235,11 +235,10 @@ public class MapsActivity extends FragmentActivity implements
                 } else if (gameMode == 2) {
                     //set message to bounty hunter - the if should never happen
                     if (theHunted.getParticipantId().equals(mMyId)) {
-                        message = "Bounty Hunter\nYou are the target!\n" + getString(R.string.mode2instructions);
+                        message = "You are the target!\n\n" + getString(R.string.mode2instructions);
                     } else {
-                        message = "Bounty Hunter\nThe target is " + theHunted.getDisplayName() + ".\n" + getString(R.string.mode2instructions);
+                        message = "Your target is " + theHunted.getDisplayName() + ".\n\n" + getString(R.string.mode2instructions);
                     }
-                    //TODO set brief instruction strings
 
                 }
                 new AlertDialog.Builder(MapsActivity.this) //
@@ -325,7 +324,7 @@ public class MapsActivity extends FragmentActivity implements
                         kill.setVisibility(View.GONE);
                         knifeImg.setVisibility(View.VISIBLE);
                         returnToMap.setVisibility(View.VISIBLE);
-                        selectkill.setText("Push to Kill\n" + theHunted.getDisplayName());
+                        selectkill.setText("Push the Image to Kill\n" + theHunted.getDisplayName());
                         selectkill.setVisibility(View.VISIBLE);
                         bountyPlayer.setVisibility(View.VISIBLE);
 
