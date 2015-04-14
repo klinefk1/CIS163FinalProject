@@ -106,6 +106,7 @@ public class ResultActivity extends ActionBarActivity {
             }
         });
 
+        totalkills+=currentkills;
         //sets text to current games wins
         killsInGame.setText("Kills: "+ currentkills);
         totkills.setText("Total Kills: "+ totalkills);
