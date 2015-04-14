@@ -114,6 +114,16 @@ public class ResultActivity extends ActionBarActivity {
         bhkill.setText("Bounty Hunter: "+ bhkills);
         ffawin.setText("Free For All: "+ ffawins);
         bhwin.setText("Bounty Hunter: "+ bhwins);
+
+        SharedPreferences.Editor ped = prefs.edit();
+        ped.putInt ("totalkills", totalkills);
+        ped.putInt("currentkills", currentkills);
+        ped.putInt("totalwins", totalwins);
+        ped.putInt("ffawins", ffawins);
+        ped.putInt("bhwins", bhwins);
+        ped.putInt("ffakills", ffakills);
+        ped.putInt("bhkills", bhkills);
+        ped.commit();
     }
 
     @Override
