@@ -36,8 +36,14 @@
     <string name="gamehelper_app_misconfigured">miscofigured</string>
     <string name="gamehelper_license_failed">liscence falied</string>
 
-    <string name="mode1instructions">Instructions for Free-For-All will be shown here.</string>
-    <string name="mode2instructions">Instructions for Bounty Hunter will be shown here.</string>
+    <string name="mode1instructions">It\'s a Free-For-All!  Everyone is out to get everyone else.
+        To kill a player, push "kill" button on the top of the screen,
+        then touch the player you want to kill.  That player must
+        confirm the kill for it to be recorded.</string>
+    <string name="mode2instructions">You\'re playing Bounty Hunter!  You are only allowed to kill the
+        person your target.  To kill that player, push the "kill" button on top of the
+        screen, then touch the picture of the player.  That player must confirm the kill for it to
+        be recorded.  Once you kill a player, you will be assigned a new target.</string>
 
     <string name="single_player">Single Player</string>
 
