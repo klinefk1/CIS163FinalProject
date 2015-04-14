@@ -2,8 +2,7 @@ Things that still need done:
 
 	- make button work for Austin's instruction screen
 
-	- resize icon to 512x512 and .png (I can do that)
-	- screenShots: 2 - 8 @ min len 320px max len 3840px (I can do that too)
+	- screenShots: 2 - 8 @ min len 320px max len 3840px (I can do that)
 
 	- Info for publishing:
 		-Short description (up to 80 char)
