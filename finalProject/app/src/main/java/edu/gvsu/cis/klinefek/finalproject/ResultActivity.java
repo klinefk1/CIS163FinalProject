@@ -48,7 +48,13 @@ public class ResultActivity extends ActionBarActivity {
         //manager to save all of the data locally
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        checkNewGame();
+        //Gets all saved values. If the value does not exist it sets it to 0
+        totalkills = prefs.getInt("totalkills", 0);
+        ffakills = prefs.getInt("ffakills", 0);
+        bhkills = prefs.getInt("bhkills", 0);
+        totalwins = prefs.getInt("totalwins", 0);
+        ffawins = prefs.getInt("ffawins", 0);
+        bhwins = prefs.getInt("bhwins", 0);
 
         //changes things based on the game mode you played
         if(mode == 1)
@@ -147,51 +153,6 @@ public class ResultActivity extends ActionBarActivity {
         ped.putInt("ffakills", ffakills);
         ped.putInt("bhkills", bhkills);
         ped.commit();
-    }
-
-    public void checkNewGame()
-    {
-        if (prefs.contains("totalkills")) {
-            totalkills = prefs.getInt("totalkills", 0)+currentkills;
-        }
-        else{
-            totalkills = currentkills;
-        }
-        if(prefs.contains("totalwins"))
-        {
-            totalwins = prefs.getInt("totalwins", 0);
-        }
-        else{
-            totalwins = 0;
-        }
-        if(prefs.contains("ffawins"))
-        {
-            ffawins = prefs.getInt("ffawins", 0);
-        }
-        else{
-            ffawins = 0;
-        }
-        if(prefs.contains("bhwins"))
-        {
-            bhwins = prefs.getInt("bhwins", 0);
-        }
-        else{
-            bhwins = 0;
-        }
-        if(prefs.contains("ffakills"))
-        {
-            ffakills = prefs.getInt("ffakills", 0);
-        }
-        else{
-            ffakills = 0;
-        }
-        if(prefs.contains("bhkills"))
-        {
-            bhkills = prefs.getInt("bhkills", 0);
-        }
-        else{
-            bhkills = 0;
-        }
     }
 
     @Override
