@@ -66,13 +66,18 @@ public class ResultActivity extends ActionBarActivity {
                 ffawins++;
             }
         }
-        else{
+        else if(mode == 2){
             gamemode.setText("Gamemode: Bounty Hunter");
             bhkills+=currentkills;
             if(win)
             {
                 bhwins++;
             }
+        }
+        else{
+            gamemode.setVisibility(View.GONE);
+            winLoss.setText("Last Game Kills:");
+
         }
 
         //changes text based of if you won or lost the game played
