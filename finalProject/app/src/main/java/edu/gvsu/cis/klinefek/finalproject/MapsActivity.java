@@ -1762,8 +1762,6 @@ public class MapsActivity extends FragmentActivity implements
     public void onRealTimeMessageSent(int i, int i2, String s) {
         Log.d("Message Sent", "sent");
 
-        //TODO fix messages everywhere except original one
-
         //Sends messages to all in queue
         if(messagesToSend.size() > 0){
             String rec = messagesToSend.peek().first;
@@ -1776,7 +1774,6 @@ public class MapsActivity extends FragmentActivity implements
         }
 
         if(gameOver && messagesToSend.size() < 1){
-            //TODO put intent here
             Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
             finalScreen.putExtra("mode", gameMode);
             finalScreen.putExtra("win", win);
