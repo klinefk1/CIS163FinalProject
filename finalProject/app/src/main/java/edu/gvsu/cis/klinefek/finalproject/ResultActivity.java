@@ -110,6 +110,20 @@ public class ResultActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferences.Editor ped = prefs.edit();
+        ped.putInt ("totalkills", totalkills);
+        ped.putInt("currentkills", currentkills);
+        ped.putInt("totalwins", totalwins);
+        ped.putInt("ffawins", ffawins);
+        ped.putInt("bhwins", bhwins);
+        ped.putInt("ffakills", ffakills);
+        ped.putInt("bhkills", bhkills);
+        ped.commit();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         totalkills= prefs.getInt("totalkills", 0);
