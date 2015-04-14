@@ -636,15 +636,6 @@ public class MapsActivity extends FragmentActivity implements
                         mRoomId, rec);
             }
 
-
-
-//            Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-//            finalScreen.putExtra("mode", gameMode);
-//            finalScreen.putExtra("win", false);
-//            finalScreen.putExtra("kills", numberOfKills);
-//            leaveRoom();
-//            startActivity(finalScreen);
-//            finish();
         }
     }
 
@@ -1311,14 +1302,6 @@ public class MapsActivity extends FragmentActivity implements
                                 mMsgBuf[0] = 'A';
                                 Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, MapsActivity.this, mMsgBuf,
                                         mRoomId, sendTo);
-                                //intent to final screen
-//                                Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-//                                finalScreen.putExtra("mode", gameMode);
-//                                finalScreen.putExtra("win", false);
-//                                finalScreen.putExtra("kills", numberOfKills);
-//                                leaveRoom();
-//                                startActivity(finalScreen);
-//                                finish();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1362,14 +1345,6 @@ public class MapsActivity extends FragmentActivity implements
                                 gameOver = true;
                                 Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, MapsActivity.this, message,
                                         mRoomId, sendTo);
-                                //intent to final screen
-                                Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
-//                                finalScreen.putExtra("mode", gameMode);
-//                                finalScreen.putExtra("win", false);
-//                                finalScreen.putExtra("kills", numberOfKills);
-//                                leaveRoom();
-//                                startActivity(finalScreen);
-//                                finish();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1814,9 +1789,5 @@ public class MapsActivity extends FragmentActivity implements
 
             }
         }
-
     }
-
-
-
 }
