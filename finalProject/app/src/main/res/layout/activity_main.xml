@@ -18,7 +18,8 @@
         android:id="@+id/title"
         android:textColor="#B22222"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textSize="40dp" />
 
     <Button
         style="?android:attr/buttonStyleSmall"

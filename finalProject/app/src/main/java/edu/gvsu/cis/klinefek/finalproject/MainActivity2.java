@@ -20,13 +20,13 @@ public class MainActivity2 extends ActionBarActivity {
 
         ffaRules = (TextView) findViewById(R.id.ffaRules);
 
-        ffaRules.setText("In this game, it is a complete free for all. That means every assassin for themselves. The objective is to kill all your friends before they kill you first.  You can kill them anywhere you would like, as long as you follow a few simple rules.\n"
-                +"1. No killing while someone is driving\n"
-                +"2. No killing among places everyone agrees are safe zones (if any)\n"
-                +"3. To get a kill, you must hit your friend in the chest An assassin can defend him or herself. If the assassin is holding his or her phone in their hand AND makes a movement to defend him or herself while an assassination attempt is going on, they have blocked the current attempt. Both assassins will walk away as if nothing happened.\n"
-                +" If there are any disputes whether you think they got killed or not, you can settle it in two ways.\n"
-                +"\t1. Describe the Assassination attempt (or kill) to fellow assassins to see what their opinions are\n"
-                +"\t2. Rock, Paper, Scissors (Best 2/3) The winner of free for all is not who gets the most kills, but whoever the last person alive is. Use this to your advantage.");
+        ffaRules.setText("In this game, it is a complete free for all. That means every assassin for themselves. The objective is to kill all your friends before they kill you first.  You can kill them anywhere you would like, as long as you follow a few simple rules.\n\n"
+                +"1. No killing while someone is driving\n\n"
+                +"2. No killing among places everyone agrees are safe zones (if any)\n\n"
+                +"3. To get a kill, you must hit your friend in the chest. An assassin can defend him or herself. If the assassin is holding his or her phone in their hand AND makes a movement to defend him or herself while an assassination attempt is going on, they have blocked the current attempt. Both assassins will walk away as if nothing happened.\n\n"
+                +" If there are any disputes whether you think they got killed or not, you can settle it in two ways.\n\n"
+                +"1. Describe the Assassination attempt (or kill) to fellow assassins to see what their opinions are\n\n"
+                +"2. Rock, Paper, Scissors (Best 2/3) The winner of free for all is not who gets the most kills, but whoever the last person alive is. Use this to your advantage.");
         ffaRules.setMovementMethod(new ScrollingMovementMethod());
     }
 
