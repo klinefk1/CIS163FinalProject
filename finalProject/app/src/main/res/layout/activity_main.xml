@@ -29,8 +29,8 @@
         android:textColor="#FF2121"
         android:text="Stats"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/Rules"
-        android:layout_toEndOf="@+id/Rules" />
+        android:layout_alignRight="@+id/title"
+        android:layout_alignEnd="@+id/title" />
 
     <Button
         style="?android:attr/buttonStyleSmall"

@@ -18,7 +18,7 @@ public class MainActivity2 extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_activity2);
 
-        ffaRules = (TextView) findViewById(R.id.ffarules);
+        ffaRules = (TextView) findViewById(R.id.ffaRules);
 
         ffaRules.setText("In this game, it is a complete free for all. That means every assassin for themselves. The objective is to kill all your friends before they kill you first.  You can kill them anywhere you would like, as long as you follow a few simple rules.\n"
                 +"1. No killing while someone is driving\n"

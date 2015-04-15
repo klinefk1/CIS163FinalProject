@@ -16,7 +16,7 @@ public class bountyHunter extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bounty_hunter);
-         BHrules = (TextView) findViewById(R.id.ffarules);
+         BHrules = (TextView) findViewById(R.id.BHrules);
 
         BHrules.setText("Bounty Hunter differs from Free for All. In this game mode, you are given one target which you must assassinate. One assassin is also given you as a target. Your goal is to kill your target quickly. The first person to achieve 3-5 bounties (depending on the amount of people) wins.  You can kill them anywhere you would like, as long as you follow a few simple rules.\n"
                 + "1. No killing while someone is driving\n"
