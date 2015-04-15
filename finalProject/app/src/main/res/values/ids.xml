@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-
     <!--Strings for achievements-->
-    <string name="achievement_first_kill">CgkImPf2iIsXEAIQAQ</string>
-    <string name="achievement_no_going_back">CgkImPf2iIsXEAIQAg</string>
-    <string name="achievement_youre_getting_the_hang_of_it">CgkImPf2iIsXEAIQAw</string>
-    <string name="achievement_madman">CgkImPf2iIsXEAIQBA</string>
-    <string name="achievement_slow_down_killer">CgkImPf2iIsXEAIQBQ</string>
-    <string name="achievement_serial_killer">CgkImPf2iIsXEAIQBg</string>
-    <string name="achievement_rough_day">CgkImPf2iIsXEAIQBw</string>
-    <string name="achievement_rough_week">CgkImPf2iIsXEAIQCA</string>
-    <string name="achievement_rough_life">CgkImPf2iIsXEAIQCQ</string>
-    <string name="achievement_bounty_hunter">CgkImPf2iIsXEAIQCg</string>
-    <string name="achievement_fix_title_later">CgkImPf2iIsXEAIQCw</string>
+    <string name="achievement_first_kill">CgkImPf2iIsXEAIQDA</string>
+    <string name="achievement_no_going_back">CgkImPf2iIsXEAIQDQ</string>
+    <string name="achievement_bounty_beginner">CgkImPf2iIsXEAIQFA</string>
+    <string name="achievement_bounty_expert">CgkImPf2iIsXEAIQFQ</string>
+    <string name="achievement_freeforall_beginner">CgkImPf2iIsXEAIQFg</string>
+    <string name="achievement_freeforall_expert">CgkImPf2iIsXEAIQFw</string>
 </resources>
