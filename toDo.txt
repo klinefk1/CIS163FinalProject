@@ -1,21 +1,13 @@
-Things that need done for the final project:
+Things that still need done:
 
-	-add at least 5 achievements (we should make these fairly easy to implement)
-		- kill all the other players in an 8 player free-for-all (serial killer?)
-		- win certain number of free-for-all matches
-		- win certain number of bounty hunter matches
-		- total kills excedes certain number
-		- kill single player multiple times
-		-Austin
+	- make button work for Austin's instruction screen
 
-	-add instructions activity accessable from main screen
-		-Austin
+	- screenShots: 2 - 8 @ min len 320px max len 3840px (I can do that)
 
-	-debug game logic
-		-Katherine
-		
-	optional:
-	- add leaderboard (google developer has API for that)
+	- Info for publishing:
+		-Short description (up to 80 char)
+		-Full description (up to 4000 char)
 
 
-	8am-1pm engineering project day
+	I reread the thing about publishing and it will not allow it without at least 5 achievements, so let's pick the easiest 5 to implement and do that.  We can add more if we want later.  I can try to do this and test it tonight/tomorrow morning.  Can we meet at 
+	2pm again and publish then?
