@@ -1223,6 +1223,22 @@ public class MapsActivity extends FragmentActivity implements
                     gameResults.set(p, 1); //indicates won game
 
                     win = true;
+                    Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_no_going_back));
+
+                    if(numberOfKills == players.size() - 1 && players.size() <= 4 && gameMode == 1){
+                        Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_freeforall_beginner));
+                    }
+
+                    if(numberOfKills == players.size() - 1 && players.size() > 4 && gameMode == 1){
+                        Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_freeforall_expert));
+                    }
+                    if(numberOfKills == players.size() - 1 && players.size() <= 4 && gameMode == 2){
+                        Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_bounty_beginner));
+                    }
+                    if(numberOfKills == players.size() - 1 && players.size() > 4 && gameMode == 2){
+                        Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_bounty_expert));
+                    }
+
                     Intent finalScreen = new Intent(MapsActivity.this, ResultActivity.class);
                     finalScreen.putExtra("mode", gameMode);
                     finalScreen.putExtra("win", true);
@@ -1469,6 +1485,9 @@ public class MapsActivity extends FragmentActivity implements
                     }
                 }
                 numberOfKills++;
+                if(numberOfKills >= 1){
+                    Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_first_kill));
+                }
                 Toast.makeText(getApplicationContext(), senderName + " was killed.", Toast.LENGTH_LONG).show();
 
 
@@ -1512,6 +1531,9 @@ public class MapsActivity extends FragmentActivity implements
                 }
 
                 numberOfKills++;
+                if(numberOfKills >= 1){
+                    Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_first_kill));
+                }
 
 
                 String newTar = theHunted.getDisplayName() +
