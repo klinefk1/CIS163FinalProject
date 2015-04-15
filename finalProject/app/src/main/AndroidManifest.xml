@@ -67,6 +67,26 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name=".RulesPage"
+            android:label="Rules"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".MainActivity2"
+            android:label="Free For All Rules"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".bountyHunter"
+            android:label="Bounty Hunter Rules"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".Secretscreen"
+            android:label="Secret Screen"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name=".FrequentlyAskedQuestions"
             android:label="@string/title_activity_frequently_asked_questions" >
         </activity>

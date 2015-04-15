@@ -36,7 +36,7 @@
     <string name="gamehelper_app_misconfigured">miscofigured</string>
     <string name="gamehelper_license_failed">liscence falied</string>
 
-    <string name="mode1instructions">It\'s a Free-For-All!  Everyone is out to get everyone else.
+    <string name="mode1instructions">It\'s a Free For All!  Everyone is out to get everyone else.
         To kill a player, push "kill" button on the top of the screen,
         then touch the player you want to kill.  That player must
         confirm the kill for it to be recorded.</string>

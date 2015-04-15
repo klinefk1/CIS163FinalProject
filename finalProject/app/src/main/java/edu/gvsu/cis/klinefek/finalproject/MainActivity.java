@@ -41,7 +41,7 @@ public class MainActivity extends ActionBarActivity {
         toRules.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent RulesPage = new Intent(MainActivity.this, ResultActivity.class);
+                Intent RulesPage = new Intent(MainActivity.this, RulesPage.class);
                 startActivity(RulesPage);
             }
         });
