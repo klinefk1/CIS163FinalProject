@@ -27,7 +27,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.plus.Plus;
 
 
-public class ResultActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class ResultActivity extends ActionBarActivity{
 
     private boolean win;            //true is win, false is lost
     private int currentkills, mode, totalkills, ffakills, bhkills, totalwins, ffawins, bhwins; //1 for free-for-all, 2 for bounty hunter
@@ -36,7 +36,6 @@ public class ResultActivity extends ActionBarActivity implements GoogleApiClient
     private TextView killsInGame, winLoss, gamemode, totkills, ffakill,bhkill, totwin, ffawin, bhwin;
     private ImageView redLine;
 
-    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,26 +197,9 @@ public class ResultActivity extends ActionBarActivity implements GoogleApiClient
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i("asdf", "GoogleApiClient connected");
 
-    }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.i("asdf", "GoogleApiClient connection suspended");
-        retryConnecting();
-    }
 
-    private void retryConnecting() {
-        if (!mGoogleApiClient.isConnecting()) {
-            mGoogleApiClient.connect();
-        }
-    }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d("asdf", "onConnectionFailed() called. Trying to reconnect.");
-    }
+
 }

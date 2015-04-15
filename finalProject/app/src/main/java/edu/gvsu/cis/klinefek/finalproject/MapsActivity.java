@@ -412,7 +412,6 @@ public class MapsActivity extends FragmentActivity implements
     protected void onStart() {
         switchToScreen(R.id.screen_wait);
         if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
-            Log.d(TAG, "Connecting client.");
             mGoogleApiClient.connect();
         }
         super.onStart();
@@ -439,7 +438,6 @@ public class MapsActivity extends FragmentActivity implements
                 // we got the result from the "waiting room" UI.
                 if (resultCode == Activity.RESULT_OK) {
                     // ready to start playing
-                    Log.d(TAG, "Starting game (waiting room returned OK).");
                     startGame(true);
                 } else if (resultCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
                     // player indicated that they want to leave the room
@@ -452,8 +450,6 @@ public class MapsActivity extends FragmentActivity implements
                 }
                 break;
             case RC_SIGN_IN:
-                Log.d(TAG, "onActivityResult with requestCode == RC_SIGN_IN, responseCode="
-                        + resultCode + ", intent=" + data);
                 mSignInClicked = false;
                 mResolvingConnectionFailure = false;
                 if (resultCode == RESULT_OK) {
@@ -469,21 +465,16 @@ public class MapsActivity extends FragmentActivity implements
     // "Invite friends" button. We react by creating a room with those players.
     private void handleSelectPlayersResult(int response, Intent data) {
         if (response != Activity.RESULT_OK) {
-            Log.w(TAG, "*** select players UI cancelled, " + response);
             switchToMainScreen();
             switchToScreen(R.id.screen_main);
             return;
         }
 
-        Log.d(TAG, "Select players UI succeeded.");
-
         // get the invitee list
         final ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
-        Log.d(TAG, "Invitee count: " + invitees.size());
 
 
         // create the room
-        Log.d(TAG, "Creating room...");
         RoomConfig.Builder rtmConfigBuilder = RoomConfig.builder(this);
         rtmConfigBuilder.addPlayersToInvite(invitees);
         rtmConfigBuilder.setMessageReceivedListener(this);
@@ -492,19 +483,16 @@ public class MapsActivity extends FragmentActivity implements
         keepScreenOn();
         Games.RealTimeMultiplayer.create(mGoogleApiClient, rtmConfigBuilder.build());
 
-        Log.d(TAG, "Room created, waiting for it to be ready...");
     }
 
     // Handle the result of the invitation inbox UI, where the player can pick an invitation
     // to accept. We react by accepting the selected invitation, if any.
     private void handleInvitationInboxResult(int response, Intent data) {
         if (response != Activity.RESULT_OK) {
-            Log.w(TAG, "*** invitation inbox UI cancelled, " + response);
             switchToMainScreen();
             return;
         }
 
-        Log.d(TAG, "Invitation inbox UI succeeded.");
         Invitation inv = data.getExtras().getParcelable(Multiplayer.EXTRA_INVITATION);
 
         // accept invitation
@@ -514,7 +502,6 @@ public class MapsActivity extends FragmentActivity implements
     // Accept the given invitation.
     void acceptInviteToRoom(String invId) {
         // accept the invitation
-        Log.d(TAG, "Accepting invitation: " + invId);
         RoomConfig.Builder roomConfigBuilder = RoomConfig.builder(this);
         roomConfigBuilder.setInvitationIdToAccept(invId)
                 .setMessageReceivedListener(this)
@@ -528,7 +515,6 @@ public class MapsActivity extends FragmentActivity implements
     // accomplishing other tasks.  Goes to sign-in screen if becomes disconnected
     @Override
     public void onStop() {
-        Log.d(TAG, "**** got onStop");
 
         // stop trying to keep the screen on
         stopKeepingScreenOn();
@@ -641,7 +627,6 @@ public class MapsActivity extends FragmentActivity implements
 
     // Leave the room.
     void leaveRoom() {
-        Log.d(TAG, "Leaving room.");
         stopKeepingScreenOn();
         if (mRoomId != null) {
             Games.RealTimeMultiplayer.leave(mGoogleApiClient, this, mRoomId);
@@ -712,7 +697,6 @@ public class MapsActivity extends FragmentActivity implements
      */
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.i(TAG, "GoogleApiClient connected");
         LocationRequest req = new LocationRequest();
         req.setInterval(10000); /*every 10 seconds*/
         req.setFastestInterval(1000); /*how fast our app can handle the notifications */
@@ -720,21 +704,15 @@ public class MapsActivity extends FragmentActivity implements
 
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, req, this);
 
-        Log.d(TAG, "onConnected() called. Sign in successful!");
-
-        Log.d(TAG, "Sign-in succeeded.");
-
         // register listener so we are notified if we receive an invitation to play
         // while we are in the game
         Games.Invitations.registerInvitationListener(mGoogleApiClient, this);
 
         if (connectionHint != null) {
-            Log.d(TAG, "onConnected: connection hint provided. Checking for invite.");
             Invitation inv = connectionHint
                     .getParcelable(Multiplayer.EXTRA_INVITATION);
             if (inv != null && inv.getInvitationId() != null) {
                 // retrieve and cache the invitation ID
-                Log.d(TAG, "onConnected: connection hint has a room invite!");
                 acceptInviteToRoom(inv.getInvitationId());
                 return;
             }
@@ -748,7 +726,6 @@ public class MapsActivity extends FragmentActivity implements
      */
     @Override
     public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "GoogleApiClient connection suspended");
         retryConnecting();
     }
 
@@ -759,9 +736,7 @@ public class MapsActivity extends FragmentActivity implements
      */
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.d(TAG, "onConnectionFailed() called. Trying to reconnect." + result.getErrorCode());
         if (mResolvingConnectionFailure) {
-            Log.d(TAG, "onConnectionFailed() ignoring connection failure; already resolving.");
             return;
         }
 
@@ -774,7 +749,6 @@ public class MapsActivity extends FragmentActivity implements
 
         switchToScreen(R.id.screen_sign_in);
 
-        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
         if (!result.hasResolution()) {
             // Show a localized error dialog.
             GooglePlayServicesUtil.getErrorDialog(
@@ -796,7 +770,6 @@ public class MapsActivity extends FragmentActivity implements
         try {
             result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
         } catch (IntentSender.SendIntentException e) {
-            Log.e(TAG, "Exception while starting resolution activity", e);
             retryConnecting();
         }
     }
@@ -867,9 +840,7 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onRoomCreated(int i, Room room) {
-        Log.d(TAG, "onRoomCreated(" + i + ", " + room + ")");
         if (i != GamesStatusCodes.STATUS_OK) {
-            Log.e(TAG, "*** Error: onRoomCreated, status " + i);
             showGameError();
             return;
         }
@@ -880,9 +851,7 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onJoinedRoom(int i, Room room) {
-        Log.d(TAG, "onJoinedRoom(" + i + ", " + room + ")");
         if (i != GamesStatusCodes.STATUS_OK) {
-            Log.e(TAG, "*** Error: onRoomConnected, status " + i);
             showGameError();
             return;
         }
@@ -892,15 +861,12 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onLeftRoom(int i, String s) {
         // we have left the room; return to main screen.
-        Log.d(TAG, "onLeftRoom, code " + i);
         switchToMainScreen();
     }
 
     @Override
     public void onRoomConnected(int i, Room room) {
-        Log.d(TAG, "onRoomConnected(" + i + ", " + room + ")");
         if (i != GamesStatusCodes.STATUS_OK) {
-            Log.e(TAG, "*** Error: onRoomConnected, status " + i);
             showGameError();
             return;
         }
@@ -940,7 +906,6 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onConnectedToRoom(Room room) {
-        Log.d(TAG, "onConnectedToRoom.");
 
         // get room ID, participants and my ID:
         mRoomId = room.getRoomId();
@@ -952,10 +917,6 @@ public class MapsActivity extends FragmentActivity implements
             gameResults.add(0);             //indicates active player
         }
 
-        // print out the list of participants (for debug purposes)
-        Log.d(TAG, "Room ID: " + mRoomId);
-        Log.d(TAG, "My ID " + mMyId);
-        Log.d(TAG, "<< CONNECTED TO ROOM>>");
     }
 
     @Override
@@ -1291,7 +1252,6 @@ public class MapsActivity extends FragmentActivity implements
 
         byte[] buf = rtm.getMessageData();
         final String sender = rtm.getSenderParticipantId();
-        Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
 
         if (buf[0] == 'K') {                //receiving message to confirm a kill
             if (gameMode == 1) {
@@ -1722,18 +1682,15 @@ public class MapsActivity extends FragmentActivity implements
                 // NOTE: this check is here only because this is a sample! Don't include this
                 // check in your actual production app.
                 if (!BaseGameUtils.verifySampleSetup(this, R.string.app_id)) {
-                    Log.w(TAG, "*** Warning: setup problems detected. Sign in may not work!");
                 }
 
                 // start the sign-in flow
-                Log.d(TAG, "Sign-in button clicked");
                 mSignInClicked = true;
                 mGoogleApiClient.connect();
                 break;
             case R.id.button_sign_out:
                 // user wants to sign out
                 // sign out.
-                Log.d(TAG, "Sign-out button clicked");
                 mSignInClicked = false;
                 Games.signOut(mGoogleApiClient);
                 mGoogleApiClient.disconnect();
@@ -1756,7 +1713,6 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onRealTimeMessageSent(int i, int i2, String s) {
-        Log.d("Message Sent", "sent");
 
         //Sends messages to all in queue
         if(messagesToSend.size() > 0){
