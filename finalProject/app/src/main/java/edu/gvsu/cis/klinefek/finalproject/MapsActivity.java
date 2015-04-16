@@ -1679,11 +1679,6 @@ public class MapsActivity extends FragmentActivity implements
                 break;
             case R.id.button_sign_in:
                 // user wants to sign in
-                // Check to see the developer who's running this sample code read the instructions :-)
-                // NOTE: this check is here only because this is a sample! Don't include this
-                // check in your actual production app.
-                if (!BaseGameUtils.verifySampleSetup(this, R.string.app_id)) {
-                }
 
                 // start the sign-in flow
                 mSignInClicked = true;
