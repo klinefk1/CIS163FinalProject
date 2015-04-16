@@ -115,7 +115,8 @@ public class MapsActivity extends FragmentActivity implements
     // event handlers.
     final static int[] CLICKABLES = {
             R.id.button_accept_popup_invitation,
-            R.id.button_see_invitations, R.id.freeForAll, R.id.bountyHunter
+            R.id.button_see_invitations, R.id.freeForAll, R.id.bountyHunter,
+            R.id.button_sign_out, R.id.button_sign_in
     };
 
 

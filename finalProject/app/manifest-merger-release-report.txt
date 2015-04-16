@@ -14,35 +14,35 @@ ADDED from AndroidManifest.xml:2:1
 		INJECTED from AndroidManifest.xml:0:0
 		INJECTED from AndroidManifest.xml:0:0
 uses-feature#0x00020000
-ADDED from AndroidManifest.xml:6:5
+ADDED from AndroidManifest.xml:5:5
 	android:glEsVersion
-		ADDED from AndroidManifest.xml:7:9
+		ADDED from AndroidManifest.xml:6:9
 	android:required
-		ADDED from AndroidManifest.xml:8:9
+		ADDED from AndroidManifest.xml:7:9
 uses-permission#android.permission.INTERNET
+ADDED from AndroidManifest.xml:9:5
+	android:name
+		ADDED from AndroidManifest.xml:9:22
+uses-permission#android.permission.ACCESS_NETWORK_STATE
 ADDED from AndroidManifest.xml:10:5
 	android:name
 		ADDED from AndroidManifest.xml:10:22
-uses-permission#android.permission.ACCESS_NETWORK_STATE
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
 ADDED from AndroidManifest.xml:11:5
 	android:name
 		ADDED from AndroidManifest.xml:11:22
-uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+uses-permission#com.google.android.providers.gsf.permission.READ_GSERVICES
 ADDED from AndroidManifest.xml:12:5
 	android:name
 		ADDED from AndroidManifest.xml:12:22
-uses-permission#com.google.android.providers.gsf.permission.READ_GSERVICES
+uses-permission#android.permission.ACCESS_WIFI_STATE
 ADDED from AndroidManifest.xml:13:5
 	android:name
 		ADDED from AndroidManifest.xml:13:22
-uses-permission#android.permission.ACCESS_WIFI_STATE
+uses-permission#android.permission.VIBRATE
 ADDED from AndroidManifest.xml:14:5
 	android:name
 		ADDED from AndroidManifest.xml:14:22
-uses-permission#android.permission.VIBRATE
-ADDED from AndroidManifest.xml:15:5
-	android:name
-		ADDED from AndroidManifest.xml:15:22
 uses-permission#android.permission.ACCESS_COARSE_LOCATION
 ADDED from AndroidManifest.xml:20:5
 	android:name
@@ -101,9 +101,9 @@ ADDED from AndroidManifest.xml:43:9
 meta-data#com.google.android.gms.games.APP_ID
 ADDED from AndroidManifest.xml:46:9
 	android:value
-		ADDED from AndroidManifest.xml:47:13
+		ADDED from AndroidManifest.xml:48:13
 	android:name
-		ADDED from AndroidManifest.xml:46:20
+		ADDED from AndroidManifest.xml:47:13
 activity#edu.gvsu.cis.klinefek.finalproject.MapsActivity
 ADDED from AndroidManifest.xml:50:9
 	android:screenOrientation
@@ -136,6 +136,44 @@ ADDED from AndroidManifest.xml:65:9
 		ADDED from AndroidManifest.xml:67:13
 	android:name
 		ADDED from AndroidManifest.xml:66:13
+activity#edu.gvsu.cis.klinefek.finalproject.RulesPage
+ADDED from AndroidManifest.xml:70:9
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:73:13
+	android:label
+		ADDED from AndroidManifest.xml:72:13
+	android:name
+		ADDED from AndroidManifest.xml:71:13
+activity#edu.gvsu.cis.klinefek.finalproject.MainActivity2
+ADDED from AndroidManifest.xml:75:9
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:78:13
+	android:label
+		ADDED from AndroidManifest.xml:77:13
+	android:name
+		ADDED from AndroidManifest.xml:76:13
+activity#edu.gvsu.cis.klinefek.finalproject.bountyHunter
+ADDED from AndroidManifest.xml:80:9
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:83:13
+	android:label
+		ADDED from AndroidManifest.xml:82:13
+	android:name
+		ADDED from AndroidManifest.xml:81:13
+activity#edu.gvsu.cis.klinefek.finalproject.Secretscreen
+ADDED from AndroidManifest.xml:85:9
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:88:13
+	android:label
+		ADDED from AndroidManifest.xml:87:13
+	android:name
+		ADDED from AndroidManifest.xml:86:13
+activity#edu.gvsu.cis.klinefek.finalproject.FrequentlyAskedQuestions
+ADDED from AndroidManifest.xml:90:9
+	android:label
+		ADDED from AndroidManifest.xml:92:13
+	android:name
+		ADDED from AndroidManifest.xml:91:13
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:appcompat-v7:21.0.3:15:5

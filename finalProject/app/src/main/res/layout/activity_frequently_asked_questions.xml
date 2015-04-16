@@ -23,13 +23,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text= "  Q: If a fellow assassin makes an attempt to block my hit, but I hit them in the chest, are they dead or alive.
-         A: They stay Alive. This is because any attempt at a block while they are holding their phone counts.
-
-          Q:  What happens if I find a fellow assassin without their phone?
-           A: That Assassin was not prepared, therefore kill them. Show no mercy.
-
-            Any other questions can be emailed to TheAndroidAssassinGame@gmail.com, or figured out between the assassins in the current game.  "
+        android:text= "  Q: If a fellow assassin makes an attempt to block my hit, but I hit them in the chest, are they dead or alive.\n\n
+    A: They stay Alive. This is because any attempt at a block while they are holding their phone counts.\n\n
+    Q: What happens if I find a fellow assassin without their phone?/n/nA: That Assassin was not prepared, therefore kill them. Show no mercy.\n
+    Any other questions can be emailed to: TheAndroidAssassinGame@gmail.com or figured out between the assassins in the current game.  "
         android:id="@+id/examples"
         android:textColor="#FF2121"
     android:layout_alignParentLeft="true"
